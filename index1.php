@@ -124,6 +124,13 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
         });
     </script>
 
+    <script>
+    // استخدم JavaScript للتمرير إلى الأعلى
+    window.onload = function() {
+        window.scrollTo(0, 0);
+    }
+</script>
+
 
 <style>
         /* Add your CSS styles here */
