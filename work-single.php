@@ -3,24 +3,47 @@ require 'contc.php'; // الاتصال بقاعدة البيانات
 
 // التحقق مما إذا كان مفتاح 'id' موجودًا في GET
 if (!isset($_GET['id'])) {
-  header('Location: index1.php'); // استبدل 'products.php' بصفحة المنتجات الفعلية
-  exit();
+    // إعادة توجيه في حال عدم وجود معرف المنتج
+    header('Location: index1.php');
+    exit();
 }
-$productID = $_GET['id']; // استخدم المعرف فقط إذا كان موجودًا
+
+$productID = $_GET['id'];
+echo "Product ID: " . $productID; // تحقق من طباعة قيمة المنتج
 
 // استعلام لجلب بيانات المنتج
-$sql = "SELECT p.Title, p.Description, p.Price, p.Location, p.Category, i.ImageDescription
-        FROM product p
-        LEFT JOIN image i ON p.ProductID = i.ProductID
-        WHERE p.ProductID = ?";
-$stmt = $conn->prepare($sql);
-$stmt->execute([$productID]);
-$product = $stmt->fetch(PDO::FETCH_ASSOC);
+$sqlProduct = "SELECT Title, Description, Price, Location, Category FROM product WHERE ProductID = ?";
+$stmtProduct = $conn->prepare($sqlProduct);
+if (!$stmtProduct) {
+    die('Query preparation failed: ' . $conn->errorInfo()[2]);
+}
+$stmtProduct->execute([$productID]);
+if ($stmtProduct->errorCode() !== '00000') {
+    die('Query execution failed: ' . $stmtProduct->errorInfo()[2]);
+}
+$product = $stmtProduct->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
     echo "Product not found.";
     exit();
 }
+
+// استعلام لجلب صور المنتج
+$sqlImages = "SELECT ImageDescription FROM image WHERE ProductID = ?";
+$stmtImages = $conn->prepare($sqlImages);
+if (!$stmtImages) {
+    die('Query preparation failed: ' . $conn->errorInfo()[2]);
+}
+$stmtImages->execute([$productID]);
+if ($stmtImages->errorCode() !== '00000') {
+    die('Query execution failed: ' . $stmtImages->errorInfo()[2]);
+}
+$images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
+
+// تحقق من النتائج
+echo "Number of Images: " . count($images) . "<br>";
+echo "Images: " . json_encode($images) . "<br>";
+
 ?>
 
 
@@ -58,9 +81,11 @@ if (!$product) {
             <div class="site-section pb-0">
                 <div class="container">
                     <div class="row align-items-stretch">
-                        <div class="col-md-8" data-aos="fade-up">
-                            <img src="uploads/<?= htmlspecialchars($product['ImageDescription']) ?>" alt="Product Image" class="img-fluid">
-                        </div>
+                    <div class="col-md-8" data-aos="fade-up">
+    <?php foreach ($images as $image): ?>
+        <img src="uploads/<?= htmlspecialchars($image) ?>" alt="Product Image" class="img-fluid">
+    <?php endforeach; ?>
+</div>
                         <div class="col-md-3 ml-auto" data-aos="fade-up" data-aos-delay="100">
                             <div class="sticky-content">
                             <ul class="list-unstyled list-line mb-5">
