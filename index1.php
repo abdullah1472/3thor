@@ -2,52 +2,54 @@
 session_start();
 require 'contc.php'; // قم بتغيير 'contc.php' إلى اسم ملف اتصال قاعدة البيانات الخاص بك
 
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
-  // جلب بيانات المستخدم من الجلسة
-  $userID = $_SESSION['UserID'];
+    // جلب بيانات المستخدم من الجلسة
+    $userID = $_SESSION['UserID']; // تأكد من تغيير هذا إذا كان اسم المتغير المستخدم لديك مختلفًا
 
-  // جلب بيانات المنتج من النموذج
-  $productName = $_POST['productName'];
-  $productDescription = $_POST['productDescription'];
-  $productPrice = $_POST['productPrice'];
-  $productLocation = $_POST['productLocation'];
-  $productType = $_POST['productType'];
-  
-  // تحضير الاستعلام لإدراج المنتج في قاعدة البيانات
-  $sql = "INSERT INTO product (Title, Description, Price, Location, Category, UserID) VALUES (?, ?, ?, ?, ?, ?)";
-  $stmt = $conn->prepare($sql);
-  $stmt->execute([$productName, $productDescription, $productPrice, $productLocation, $productType, $userID]);
-  
-  // جلب معرف المنتج الجديد الذي تم إضافته
-  $productID = $conn->lastInsertId();
+    // جلب بيانات المنتج من النموذج
+    $productName = $_POST['productName']; // كانت Title في السابق
+    $productDescription = $_POST['productDescription']; // كانت Description في السابق
+    $productPrice = $_POST['productPrice']; // كانت Price في السابق
+    $productLocation = $_POST['productLocation']; // كانت Category في السابق
+    $productType = $_POST['productType']; // كانت Location في السابق
+    
+    // تحضير الاستعلام لإدراج المنتج في قاعدة البيانات
+    $sql = "INSERT INTO product (Title, Description, Price, Location, Category, UserID) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$productName, $productDescription, $productPrice, $productLocation, $productType, $userID]);
+    
+    // جلب معرف المنتج الجديد الذي تم إضافته
+    $productID = $conn->lastInsertId();
 
-  // تحديد المسار الذي ستُرفع إليه الصور
-  $targetDirectory = "uploads/";
+    // تحديد المسار الذي ستُرفع إليه الصور
+    $targetDirectory = "uploads/";
 
-  // التحقق من وجود المجلد "uploads"، وإن لم يكن موجودًا يتم إنشاؤه
-  if (!is_dir($targetDirectory)) {
-      mkdir($targetDirectory, 0777, true);
-  }
+    // التحقق من وجود المجلد "uploads"، وإن لم يكن موجودًا يتم إنشاؤه
+    if (!is_dir($targetDirectory)) {
+        mkdir($targetDirectory, 0777, true);
+    }
 
-  // تحميل كل صورة من النموذج وحفظها في المجلد "uploads"
-  foreach ($_FILES['productImages']['tmp_name'] as $key => $tmp_name) {
-      $imageName = $_FILES['productImages']['name'][$key];
-      $imageTmpName = $_FILES['productImages']['tmp_name'][$key];
-      $imagePath = $targetDirectory . $imageName;
+    // تحميل كل صورة من النموذج وحفظها في المجلد "uploads"
+    foreach ($_FILES['productImages']['tmp_name'] as $key => $tmp_name) {
+        $imageName = $_FILES['productImages']['name'][$key];
+        $imageTmpName = $_FILES['productImages']['tmp_name'][$key];
+        $imagePath = $targetDirectory . $imageName;
 
-      // التحقق من نجاح عملية تحميل الصورة قبل إدراج اسم الصورة في قاعدة البيانات
-      if (move_uploaded_file($imageTmpName, $imagePath)) {
-          // تحضير الاستعلام لإدراج اسم الصورة ومعرف المنتج المرتبط في جدول الصور
-          $sql = "INSERT INTO image (ImageDescription, ProductID) VALUES (?, ?)";
-          $stmt = $conn->prepare($sql);
-          $stmt->execute([$imageName, $productID]);
-      } else {
-          // في حالة فشل نقل الصورة
-          echo "حدث خطأ أثناء تحميل الصورة.";
-      }
-  }
+        // التحقق من نجاح عملية تحميل الصورة قبل إدراج اسم الصورة في قاعدة البيانات
+        if (move_uploaded_file($imageTmpName, $imagePath)) {
+            // تحضير الاستعلام لإدراج اسم الصورة ومعرف المنتج المرتبط في جدول الصور
+            $sql = "INSERT INTO image (ImageDescription, ProductID) VALUES (?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$imageName, $productID]);
+        } else {
+            // في حالة فشل نقل الصورة
+            echo "حدث خطأ أثناء تحميل الصورة.";
+        }
+    }
 
-  // إعادة التوجيه بعد إضافة المنتج بنجاح
+    // إعادة التوجيه بعد إضافة المنتج بنجاح
   header('Location: ' . $_SERVER['PHP_SELF']);
   exit();
 }
@@ -122,13 +124,6 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
         });
     </script>
 
-<script>
-    // استخدم JavaScript للتمرير إلى الأعلى
-    window.onload = function() {
-        window.scrollTo(0, 0);
-    }
-</script>
-
 
 <style>
         /* Add your CSS styles here */
@@ -165,11 +160,11 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             text-decoration: none;
             cursor: pointer;
         }
-
-        img.img-fluid {
-    width: 100%; /* ضبط العرض إلى عرض الحاوية */
-    height: 200px; /* ضبط ارتفاع ثابت */
-    object-fit: cover; /* سيؤدي إلى اقتصاص الصورة لتناسب الحاوية */
+        .product-image img {
+    width: 200px; /* تحديد عرض ثابت للصور */
+    height: 200px; /* تحديد ارتفاع ثابت للصور */
+    object-fit: cover; /* جعل الصور تغطي العنصر بالكامل دون تشويهها */
+    /* يمكنك إضافة أي خصائص إضافية تريدها هنا */
 }
 
 
@@ -207,11 +202,11 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
       <div class="row align-items-start">
         <div class="col-md-2">
           <ul class="custom-menu">
-            <li class="active"><a href="index1.php">Home</a></li>
-            <li><a href="about.php">About Me</a></li>
-            <li><a href="services.php">Services</a></li>
-            <li><a href="works.php">Works</a></li>
-            <li><a href="contact.php">Contact</a></li>
+            <li class="active"><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Me</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="works.html">Works</a></li>
+            <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
         <div class="col-md-6 d-none d-md-block  mr-auto">
@@ -363,12 +358,12 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
         
   
         <?php
-// استعلام جلب المنتجات بعد التعديل
-$sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, MIN(i.ImageDescription) as ImageDescription
+// استعلام لجلب بيانات المنتجات مع الصور المرتبطة بها
+$sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, GROUP_CONCAT(i.ImageDescription) AS Images
         FROM product p
         LEFT JOIN image i ON p.ProductID = i.ProductID
-        GROUP BY p.ProductID";
-
+        GROUP BY p.ProductID
+        ORDER BY p.DatePosted DESC"; // ترتيب النتائج حسب تاريخ النشر بتنازلي
 
 // تنفيذ الاستعلام
 $stmtt = $conn->prepare($sql);
@@ -379,44 +374,80 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 // عرض البيانات
 foreach ($products as $product) {
-    
+  // حساب الوقت المنقضي منذ العرض بالثواني
+  $displayTime = strtotime($product['DatePosted']);
+  $currentTime = time(); // وقت الآن بالثواني
+  $timeDiff = $currentTime - $displayTime;
 
+  // حساب الزمن المناسب بالدقائق أو الساعات أو الأيام
+  if ($timeDiff < 60) {
+      $timeAgo = "الآن";
+  } elseif ($timeDiff < 3600) {
+      $timeAgo = "قبل " . floor($timeDiff / 60) . " دقيقة";
+  } elseif ($timeDiff < 86400) {
+      $timeAgo = "قبل " . floor($timeDiff / 3600) . " ساعة";
+  } else {
+      $timeAgo = "قبل " . floor($timeDiff / 86400) . " يوم";
+  }
 
-echo"
+  // تقسيم الصور إلى مصفوفة
+  $images = explode(",", $product['Images']);
+
+  echo "
   <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
-  <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
+    <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
     <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
-      <div class='work-info'>
-        <h3>user</h3>
-        <span>" . $product['Category'] . "</span>
+        <div class='work-info'>
+          <h3>user</h3>
+          <span>" . $product['Category'] . "</span>
+        </div>";
+
+        // عرض الصورة الأولى فقط إذا كانت هناك أكثر من صورة
+        if (count($images) > 1) {
+          echo "<div class='product-image'>
+                  <img class='img-fluid' src='uploads/" . $images[0] . "'  alt='Product Image'>
+                </div>";
+        } else {
+          echo "<div class='product-image'>
+                  <img class='img-fluid' src='uploads/" . $images[0] . "'  alt='Product Image'>
+                </div>";
+        }
+
+      echo "</a>
+      <div class='p-1 text-white bg-dark-subtle container text-center'>
+        <div class='row justify-content-around'>
+          <div class='col-4'>
+            " . $timeAgo . " <!-- عرض الوقت المنقضي بصيغة مختصرة -->
+          </div>
+          <div class='col-4'>
+             " . $product['Title'] . "     
+          </div>            
+        </div>
+        <div class='row justify-content-around'>
+          <div class='col-4'>
+            " . $product['Location'] . "
+          </div>
+          <div class='col-4'>
+            " . $product['Price'] . "
+          </div> 
+        </div>         
       </div>
-      
-      <img class='img-fluid' src='uploads/" . $product['ImageDescription'] . "'  alt='Product Image'>
-    </a>
-  <div class='p-1 text-white bg-dark-subtle container text-center'>
-  <div class='row justify-content-around'>
-    <div class='col-4'>
-        " . $product['DatePosted'] . "
     </div>
-    <div class='col-4'>
-         " . $product['Title'] . "     
-    </div>            
-    </div>
-    <div class='row justify-content-around'>
-    <div class='col-4'>
-    " . $product['Location'] . "
-    </div>
-    <div class='col-4'>
-    " . $product['Price'] . "
-   </div> 
-   </div>         
-   </div>
-</div>
-";
-  
-    
+  ";
 }
+
+
+
 ?>
+
+   
+   
+    
+    
+
+
+       
+
 
 
           <div class="item photography col-sm-6 col-md-4 col-lg-4 mb-4">
