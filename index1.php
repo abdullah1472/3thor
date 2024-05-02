@@ -344,12 +344,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
 
         
   
-        <?php
+ <?php
 // استعلام لجلب بيانات المنتجات مع الصور المرتبطة بها
-$sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, i.ImageDescription
+$sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, GROUP_CONCAT(i.ImageDescription) AS Images
         FROM product p
-        LEFT JOIN image i ON p.ProductID = i.ProductID";
-
+        LEFT JOIN image i ON p.ProductID = i.ProductID
+        GROUP BY p.ProductID
+        ORDER BY p.DatePosted DESC"; // ترتيب النتائج حسب تاريخ النشر بتنازلي
 
 // تنفيذ الاستعلام
 $stmtt = $conn->prepare($sql);
@@ -360,59 +361,73 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 // عرض البيانات
 foreach ($products as $product) {
-    
+  // حساب الوقت المنقضي منذ العرض بالثواني
+  $displayTime = strtotime($product['DatePosted']);
+  $currentTime = time(); // وقت الآن بالثواني
+  $timeDiff = $currentTime - $displayTime;
 
+  // حساب الزمن المناسب بالدقائق أو الساعات أو الأيام
+  if ($timeDiff < 60) {
+      $timeAgo = "الآن";
+  } elseif ($timeDiff < 3600) {
+      $timeAgo = "قبل " . floor($timeDiff / 60) . " دقيقة";
+  } elseif ($timeDiff < 86400) {
+      $timeAgo = "قبل " . floor($timeDiff / 3600) . " ساعة";
+  } else {
+      $timeAgo = "قبل " . floor($timeDiff / 86400) . " يوم";
+  }
 
-echo"
+  // تقسيم الصور إلى مصفوفة
+  $images = explode(",", $product['Images']);
+
+  echo "
   <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
-  <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
-    <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
-      <div class='work-info'>
-        <h3>user</h3>
-        <span>" . $product['Category'] . "</span>
+    <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
+      <a href='work-single.html' class='item-wrap fancybox'>
+        <div class='work-info'>
+          <h3>user</h3>
+          <span>" . $product['Category'] . "</span>
+        </div>";
+
+        // عرض الصورة الأولى فقط إذا كانت هناك أكثر من صورة
+        if (count($images) > 1) {
+          echo "<div class='product-image'>
+                  <img class='img-fluid' src='uploads/" . $images[0] . "'  alt='Product Image'>
+                </div>";
+        } else {
+          echo "<div class='product-image'>
+                  <img class='img-fluid' src='uploads/" . $images[0] . "'  alt='Product Image'>
+                </div>";
+        }
+
+      echo "</a>
+      <div class='p-1 text-white bg-dark-subtle container text-center'>
+        <div class='row justify-content-around'>
+          <div class='col-4'>
+            " . $timeAgo . " <!-- عرض الوقت المنقضي بصيغة مختصرة -->
+          </div>
+          <div class='col-4'>
+             " . $product['Title'] . "     
+          </div>            
+        </div>
+        <div class='row justify-content-around'>
+          <div class='col-4'>
+            " . $product['Location'] . "
+          </div>
+          <div class='col-4'>
+            " . $product['Price'] . "
+          </div> 
+        </div>         
       </div>
-      
-      <img class='img-fluid' src='uploads/" . $product['ImageDescription'] . "'  alt='Product Image'>
-    </a>
-  <div class='p-1 text-white bg-dark-subtle container text-center'>
-  <div class='row justify-content-around'>
-    <div class='col-4'>
-        " . $product['DatePosted'] . "
     </div>
-    <div class='col-4'>
-         " . $product['Title'] . "     
-    </div>            
-    </div>
-    <div class='row justify-content-around'>
-    <div class='col-4'>
-    " . $product['Location'] . "
-    </div>
-    <div class='col-4'>
-    " . $product['Price'] . "
-   </div> 
-   </div>         
-   </div>
-</div>
-";
-
-
-
-
-    
-    
+  ";
 }
+
+
+
 ?>
 
-    <?php
-echo "Title: " . $product['Title'] . "<br>";
-echo "Description: " . $product['Description'] . "<br>";
-echo "Price: " . $product['Price'] . "<br>";
-echo "Date Posted: " . $product['DatePosted'] . "<br>";
-echo "Location: " . $product['Location'] . "<br>";
-echo "Category: " . $product['Category'] . "<br>";
-echo "Image Name: " . $product['ImageDescription'] . "<br>";
-echo "<hr>";
-    ?>
+   
    
     
     
