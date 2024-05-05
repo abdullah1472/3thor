@@ -9,9 +9,9 @@ if (!isset($_GET['id'])) {
 $productID = $_GET['id'];
 echo "Product ID: " . $productID;
 
-// تعديل استعلام SQL ليشمل معلومات البائع من جدول المستخدمين
+// تعديل استعلام SQL لجلب بيانات البائع مع المنتج
 $sqlProduct = "
-    SELECT p.Title, p.Description, p.Price, p.Location, p.Category, u.Phone
+    SELECT p.Title, p.Description, p.Price, p.Location, p.Category, u.Username, u.Phone
     FROM product p
     JOIN users u ON p.UserID = u.UserID
     WHERE p.ProductID = ?
@@ -35,7 +35,7 @@ if (!$product) {
 $sqlImages = "SELECT ImageDescription FROM image WHERE ProductID = ?";
 $stmtImages = $conn->prepare($sqlImages);
 if (!$stmtImages) {
-    die('Query preparation failed: ' . $conn->errorInfo()[2]);
+    die('Query preparation failed: ' . $stmtImages->errorInfo()[2]);
 }
 $stmtImages->execute([$productID]);
 if ($stmtImages->errorCode() !== '00000') {
@@ -50,7 +50,7 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title><?= htmlspecialchars($product['Title']) ?></title>
+    <title><?= htmlspecialchars($product['Username']) ?></title>
     <link href="assets/vendor/aos/aos.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -84,7 +84,7 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 <body>
     <nav class="navbar navbar-light custom-navbar">
         <div class="container">
-            <a class="navbar-brand" href="index.html">عثور</a>
+            <a class="navbar-brand" href="index1.php">عثور</a>
             <a href="#" class="burger" data-bs-toggle="collapse" data-bs-target="#main-navbar">
                 <span></span>
             </a>
@@ -95,7 +95,7 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
             <div class="container">
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6" data-aos="fade-up">
-                        <h2><?= htmlspecialchars($product['Title']) ?></h2>
+                        <h2><?= htmlspecialchars($product['Username']) ?></h2> <!-- استخدام اسم المستخدم بدلاً من عنوان المنتج -->
                         <div class="seller-rating">
                             <span class="bi bi-star-fill"></span>
                             <span class="bi bi-star-fill"></span>
@@ -134,7 +134,6 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
                                     </li>
                                     <li>الموقع: <?= htmlspecialchars($product['Location']) ?></li>
                                     <li>التصنيف: <?= htmlspecialchars($product['Category']) ?></li>
-                                    <li>رقم الهاتف: <?= htmlspecialchars($product['Phone']) ?></li>
                                 </ul>
                                 <a href="https://wa.me/<?= htmlspecialchars($product['Phone']) ?>?text=I'm%20interested%20in%20your%20product%20titled%20<?=urlencode($product['Title'])?>" class="btn btn-success mt-3"><i class="bi bi-whatsapp"></i> تواصل عبر الواتساب</a>
                                 <a href="https://waffyapp.com/" target="_blank" class="alert alert-info mt-3 d-block text-decoration-none" role="alert">
