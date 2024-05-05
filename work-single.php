@@ -1,17 +1,14 @@
 <?php
-require 'contc.php'; // الاتصال بقاعدة البيانات
+require 'contc.php';
 
-// التحقق مما إذا كان مفتاح 'id' موجودًا في GET
 if (!isset($_GET['id'])) {
-    // إعادة توجيه في حال عدم وجود معرف المنتج
     header('Location: index1.php');
     exit();
 }
 
 $productID = $_GET['id'];
-echo "Product ID: " . $productID; // تحقق من طباعة قيمة المنتج
+echo "Product ID: " . $productID;
 
-// استعلام لجلب بيانات المنتج
 $sqlProduct = "SELECT Title, Description, Price, Location, Category FROM product WHERE ProductID = ?";
 $stmtProduct = $conn->prepare($sqlProduct);
 if (!$stmtProduct) {
@@ -28,11 +25,10 @@ if (!$product) {
     exit();
 }
 
-// استعلام لجلب صور المنتج
 $sqlImages = "SELECT ImageDescription FROM image WHERE ProductID = ?";
 $stmtImages = $conn->prepare($sqlImages);
 if (!$stmtImages) {
-    die('Query preparation failed: ' . $conn->errorInfo()[2]);
+    die('Query preparation failed: ' . $stmtImages->errorInfo()[2]);
 }
 $stmtImages->execute([$productID]);
 if ($stmtImages->errorCode() !== '00000') {
@@ -40,13 +36,10 @@ if ($stmtImages->errorCode() !== '00000') {
 }
 $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 
-// تحقق من النتائج
-echo "Number of Images: " . count($images) . "<br>";
-echo "Images: " . json_encode($images) . "<br>";
+//echo "Number of Images: " . count($images) . "<br>";
+//echo "Images: " . json_encode($images) . "<br>";
 
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -59,6 +52,33 @@ echo "Images: " . json_encode($images) . "<br>";
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
+    <style>
+      
+        .product-image {
+            margin-bottom: 1rem;
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+        }
+        .images-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .seller-rating span {
+            color: #ffd700;
+        }
+        
+        
+    </style>
+    <script>
+    // استخدم JavaScript للتمرير إلى الأعلى
+    window.onload = function() {
+        window.scrollTo(0, 0);
+    }
+</script>
 </head>
 <body>
     <nav class="navbar navbar-light custom-navbar">
@@ -75,33 +95,58 @@ echo "Images: " . json_encode($images) . "<br>";
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6" data-aos="fade-up">
                         <h2><?= htmlspecialchars($product['Title']) ?></h2>
+                        <div class="seller-rating">
+                            <span class="bi bi-star-fill"></span>
+                            <span class="bi bi-star-fill"></span>
+                            <span class="bi bi-star-fill"></span>
+                            <span class="bi bi-star-fill"></span>
+                            <span class="bi bi-star-half"></span>
+                            <span>4.5</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="site-section pb-0">
                 <div class="container">
                     <div class="row align-items-stretch">
-                    <div class="col-md-8" data-aos="fade-up">
-    <?php foreach ($images as $image): ?>
-        <img src="uploads/<?= htmlspecialchars($image) ?>" alt="Product Image" class="img-fluid">
-    <?php endforeach; ?>
-</div>
+                        <div class="col-md-8" data-aos="fade-up">
+                            <div class="images-container">
+                                <?php foreach ($images as $image): ?>
+                                    <img src="uploads/<?= htmlspecialchars($image) ?>" alt="Product Image" class="product-image">
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                         <div class="col-md-3 ml-auto" data-aos="fade-up" data-aos-delay="100">
                             <div class="sticky-content">
-                            <ul class="list-unstyled list-line mb-5">
-                            <li>  <h3 class="h3"><?= htmlspecialchars($product['Title']) ?></h3></li>
-                            <li>  <p class="mb-4">السعر :<span class="text-muted">$<?= htmlspecialchars($product['Price']) ?></span></p> </li>
-                            <li>  <h4 class="h4 mb-3"> :شرح المنتج</h4></li>
-                            <li>   <div class="mb-5"><?= htmlspecialchars($product['Description']) ?></div></li>
-                                
-                               
+                                <ul class="list-unstyled list-line mb-5">
+                                    <li><h3 class="h3"><?= htmlspecialchars($product['Title']) ?></h3></li>
+                                    <li><p class="mb-4">السعر :<span class="text-muted">$<?= htmlspecialchars($product['Price']) ?></span></p></li>
+                                    <li>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="h4 mb-3"> : شرح المنتج</h4>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><?= htmlspecialchars($product['Description']) ?></p>
+        </div>
+    </div>
+</li>
+
                                     <li>Location: <?= htmlspecialchars($product['Location']) ?></li>
                                     <li>Category: <?= htmlspecialchars($product['Category']) ?></li>
                                 </ul>
+                                <a href="https://wa.me/YOUR_PHONE_NUMBER?text=I'm%20interested%20in%20your%20product%20titled%20<?=urlencode($product['Title'])?>" class="btn btn-success mt-3"><i class="bi bi-whatsapp"></i> تواصل عبر الواتساب</a>
+
+<a href="https://waffyapp.com/" target="_blank" class="alert alert-info mt-3 d-block text-decoration-none" role="alert">
+    <strong>ملاحظة :</strong> الدفع يكون عن طريق وفّي لضمان حقوقك وعدم الاحتيال عليك.
+</a>
+
+
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
         </section>
     </main>
     <footer class="footer" role="contentinfo">
