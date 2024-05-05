@@ -9,7 +9,13 @@ if (!isset($_GET['id'])) {
 $productID = $_GET['id'];
 echo "Product ID: " . $productID;
 
-$sqlProduct = "SELECT Title, Description, Price, Location, Category FROM product WHERE ProductID = ?";
+// تعديل استعلام SQL ليشمل معلومات البائع من جدول المستخدمين
+$sqlProduct = "
+    SELECT p.Title, p.Description, p.Price, p.Location, p.Category, u.Phone
+    FROM product p
+    JOIN users u ON p.UserID = u.UserID
+    WHERE p.ProductID = ?
+";
 $stmtProduct = $conn->prepare($sqlProduct);
 if (!$stmtProduct) {
     die('Query preparation failed: ' . $conn->errorInfo()[2]);
@@ -25,19 +31,17 @@ if (!$product) {
     exit();
 }
 
+// استعلام لجلب صور المنتج
 $sqlImages = "SELECT ImageDescription FROM image WHERE ProductID = ?";
 $stmtImages = $conn->prepare($sqlImages);
 if (!$stmtImages) {
-    die('Query preparation failed: ' . $stmtImages->errorInfo()[2]);
+    die('Query preparation failed: ' . $conn->errorInfo()[2]);
 }
 $stmtImages->execute([$productID]);
 if ($stmtImages->errorCode() !== '00000') {
     die('Query execution failed: ' . $stmtImages->errorInfo()[2]);
 }
 $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
-
-//echo "Number of Images: " . count($images) . "<br>";
-//echo "Images: " . json_encode($images) . "<br>";
 
 ?>
 
@@ -53,7 +57,6 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
     <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <style>
-      
         .product-image {
             margin-bottom: 1rem;
             max-width: 100%;
@@ -70,15 +73,13 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
         .seller-rating span {
             color: #ffd700;
         }
-        
-        
     </style>
     <script>
-    // استخدم JavaScript للتمرير إلى الأعلى
-    window.onload = function() {
-        window.scrollTo(0, 0);
-    }
-</script>
+        // Scroll to the top of the page on refresh
+        window.onload = function() {
+            window.scrollTo(0, 0);
+        }
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-light custom-navbar">
@@ -122,26 +123,23 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
                                     <li><h3 class="h3"><?= htmlspecialchars($product['Title']) ?></h3></li>
                                     <li><p class="mb-4">السعر :<span class="text-muted">$<?= htmlspecialchars($product['Price']) ?></span></p></li>
                                     <li>
-    <div class="card">
-        <div class="card-header">
-            <h4 class="h4 mb-3"> : شرح المنتج</h4>
-        </div>
-        <div class="card-body">
-            <p class="card-text"><?= htmlspecialchars($product['Description']) ?></p>
-        </div>
-    </div>
-</li>
-
-                                    <li>Location: <?= htmlspecialchars($product['Location']) ?></li>
-                                    <li>Category: <?= htmlspecialchars($product['Category']) ?></li>
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4 class="h4 mb-3">:شرح المنتج</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-text"><?= htmlspecialchars($product['Description']) ?></p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>الموقع: <?= htmlspecialchars($product['Location']) ?></li>
+                                    <li>التصنيف: <?= htmlspecialchars($product['Category']) ?></li>
+                                    <li>رقم الهاتف: <?= htmlspecialchars($product['Phone']) ?></li>
                                 </ul>
-                                <a href="https://wa.me/YOUR_PHONE_NUMBER?text=I'm%20interested%20in%20your%20product%20titled%20<?=urlencode($product['Title'])?>" class="btn btn-success mt-3"><i class="bi bi-whatsapp"></i> تواصل عبر الواتساب</a>
-
-<a href="https://waffyapp.com/" target="_blank" class="alert alert-info mt-3 d-block text-decoration-none" role="alert">
-    <strong>ملاحظة :</strong> الدفع يكون عن طريق وفّي لضمان حقوقك وعدم الاحتيال عليك.
-</a>
-
-
+                                <a href="https://wa.me/<?= htmlspecialchars($product['Phone']) ?>?text=I'm%20interested%20in%20your%20product%20titled%20<?=urlencode($product['Title'])?>" class="btn btn-success mt-3"><i class="bi bi-whatsapp"></i> تواصل عبر الواتساب</a>
+                                <a href="https://waffyapp.com/" target="_blank" class="alert alert-info mt-3 d-block text-decoration-none" role="alert">
+                                    <strong>ملاحظة:</strong> الدفع يكون عن طريق وفّي لضمان حقوقك وعدم الاحتيال عليك.
+                                </a>
                             </div>
                         </div>
                     </div>
