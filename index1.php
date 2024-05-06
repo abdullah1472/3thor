@@ -123,14 +123,12 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             });
         });
     </script>
-
-    <script>
+<script>
     // استخدم JavaScript للتمرير إلى الأعلى
     window.onload = function() {
         window.scrollTo(0, 0);
     }
 </script>
-
 
 <style>
         /* Add your CSS styles here */
@@ -352,13 +350,12 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
            
           </div>
           <div class="col-md-12 col-lg-6 text-start text-lg-end" data-aos="fade-up" data-aos-delay="100">
-            <div id="filters" class="filters">
-              <a href="#" data-filter="*" class="active">الكل</a>
-              <a href="#" data-filter=".web">سكن</a>
-              <a href="#" data-filter=".design">ادوات منزليه</a>
-              <a href="#" data-filter=".branding">مستلزمات دراسيه</a>
-              <a href="#" data-filter=".photography">اخرا</a>
-            </div>
+          <div class="filters">
+    <a href="index1.php" class="<?= !isset($_GET['category']) || $_GET['category'] == '' ? 'active' : '' ?>">الكل</a>
+    <a href="index1.php?category=إلكترونيات" class="<?= isset($_GET['category']) && $_GET['category'] == 'إلكترونيات' ? 'active' : '' ?>">إلكترونيات</a>
+    <a href="index1.php?category=ملابس" class="<?= isset($_GET['category']) && $_GET['category'] == 'ملابس' ? 'active' : '' ?>">ملابس</a>
+    <a href="index1.php?category=أثاث" class="<?= isset($_GET['category']) && $_GET['category'] == 'أثاث' ? 'active' : '' ?>">أثاث</a>
+</div>
           </div>
         </div>
 
@@ -368,12 +365,25 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 // استعلام لجلب بيانات المنتجات مع الصور المرتبطة بها
 $sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, GROUP_CONCAT(i.ImageDescription) AS Images
         FROM product p
-        LEFT JOIN image i ON p.ProductID = i.ProductID
-        GROUP BY p.ProductID
+        LEFT JOIN image i ON p.ProductID = i.ProductID";
+
+// إذا تم تحديد تصنيف، قم بإضافة شرط WHERE لتحديد الفئة
+if(isset($_GET['category']) && $_GET['category'] != '') {
+    $category = $_GET['category'];
+    $sql .= " WHERE p.Category = :category";
+}
+
+$sql .= " GROUP BY p.ProductID
         ORDER BY p.DatePosted DESC"; // ترتيب النتائج حسب تاريخ النشر بتنازلي
 
 // تنفيذ الاستعلام
 $stmtt = $conn->prepare($sql);
+
+// إذا تم تحديد تصنيف، قم بربط قيمة المتغير "category" مع البارامتر المستخدم في الاستعلام
+if(isset($_GET['category']) && $_GET['category'] != '') {
+    $stmtt->bindParam(':category', $category);
+}
+
 $stmtt->execute();
 
 // جلب البيانات كمصفوفة
@@ -455,121 +465,6 @@ foreach ($products as $product) {
 
        
 
-
-
-          <div class="item photography col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="work-single.html" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>user</h3>
-                <span>Photography</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_2.jpg">
-            </a>
-            <!-- التاريخ و السعر-->
-            <div class="p-1 text-white bg-dark-subtle container text-center">
-              <div class="row justify-content-around">
-                <div class="col-4">
-                    date
-                </div>
-                <div class="col-4">
-    
-                  title
-                </div>               
-                </div>
-              $
-              </div>
-              <!-- التاريخ و السعر نهايته-->
-          </div>
-          <div class="item branding col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="work-single.html" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>user</h3>
-                <span>Branding</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_3.jpg">
-            </a>
-            <!-- التاريخ و السعر-->
-            <div class="p-1 text-white bg-dark-subtle container text-center">
-              <div class="row justify-content-around">
-                <div class="col-4">
-                    date
-                </div>
-                <div class="col-4">
-    
-                  title
-                </div>               
-                </div>
-              $
-              </div>
-              <!-- التاريخ و السعر نهايته-->
-          </div>
-          <div class="item design col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="work-single.html" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>user</h3>
-                <span>Design</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_4.jpg">
-            </a>
-            <!-- التاريخ و السعر-->
-            <div class="p-1 text-white bg-dark-subtle container text-center">
-              <div class="row justify-content-around">
-                <div class="col-4">
-                    date
-                </div>
-                <div class="col-4">
-    
-                  title
-                </div>               
-                </div>
-              $
-              </div>
-              <!-- التاريخ و السعر نهايته-->
-          </div>
-          <div class="item photography col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="work-single.html" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>user</h3>
-                <span>Photography</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_5.jpg">
-            </a>
-            <!-- التاريخ و السعر-->
-            <div class="p-1 text-white bg-dark-subtle container text-center">
-              <div class="row justify-content-around">
-                <div class="col-4">
-                    date
-                </div>
-                <div class="col-4">
-    
-                  title
-                </div>               
-                </div>
-              $
-              </div>
-              <!-- التاريخ و السعر نهايته-->
-          </div>
-          <div class="item branding col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="work-single.html" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>user</h3>
-                <span>brandingn</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_6.jpg">
-            </a>
-            <!-- التاريخ و السعر-->
-            <div class="p-1 text-white bg-dark-subtle container text-center">
-              <div class="row justify-content-around">
-                <div class="col-4">
-                    date
-                </div>
-                <div class="col-4">
-    
-                  title
-                </div>               
-                </div>
-              $
-              </div>
               <!-- التاريخ و السعر نهايته-->
           </div>
         </div>
