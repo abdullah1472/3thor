@@ -2,6 +2,7 @@
 session_start();
 require 'contc.php'; // قم بتغيير 'contc.php' إلى اسم ملف اتصال قاعدة البيانات الخاص بك
 
+$defaultImagePath = "uploads/default.png"; // حدد مسار الصورة الافتراضية هنا
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
@@ -287,7 +288,7 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             <input type="text" id="productLocation" name="productLocation" required><br><br>
 
             <label for="productImages">صور المنتج:</label> 
-           <input type="file" id="productImages" name="productImages[]" multiple required><br><br>
+           <input type="file" id="productImages" name="productImages[]" multiple ><br><br>
           
     
             <input type="submit" name="send" value="نشر">
@@ -412,44 +413,45 @@ foreach ($products as $product) {
 
   echo "
   <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
-    <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
-    <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
-        <div class='work-info'>
-          <h3>user</h3>
-          <span>" . $product['Category'] . "</span>
-        </div>";
+      <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
+      <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
+          <div class='work-info'>
+              <h3>user</h3>
+              <span>" . $product['Category'] . "</span>
+          </div>";
 
-        // عرض الصورة الأولى فقط إذا كانت هناك أكثر من صورة
-        if (count($images) > 1) {
-          echo "<div class='product-image'>
-                  <img class='img-fluid' src='uploads/" . $images[0] . "'  alt='Product Image'>
-                </div>";
-        } else {
-          echo "<div class='product-image'>
-                  <img class='img-fluid' src='uploads/" . $images[0] . "'  alt='Product Image'>
-                </div>";
-        }
+          // عرض الصورة الأولى أو الصورة الافتراضية إذا لم تكن هناك صور
+          if (count($images) > 0 && $images[0] != '') {
+              $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
+              echo "<div class='product-image'>
+                      <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'>
+                  </div>";
+          } else {
+              echo "<div class='product-image'>
+                      <img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'>
+                  </div>";
+          }
 
       echo "</a>
       <div class='p-1 text-white bg-dark-subtle container text-center'>
-        <div class='row justify-content-around'>
-          <div class='col-4'>
-            " . $timeAgo . " <!-- عرض الوقت المنقضي بصيغة مختصرة -->
+          <div class='row justify-content-around'>
+              <div class='col-4'>
+                  " . $timeAgo . " <!-- عرض الوقت المنقضي بصيغة مختصرة -->
+              </div>
+              <div class='col-4'>
+                  " . $product['Title'] . "     
+              </div>            
           </div>
-          <div class='col-4'>
-             " . $product['Title'] . "     
-          </div>            
-        </div>
-        <div class='row justify-content-around'>
-          <div class='col-4'>
-            " . $product['Location'] . "
-          </div>
-          <div class='col-4'>
-            " . $product['Price'] . "
-          </div> 
-        </div>         
+          <div class='row justify-content-around'>
+              <div class='col-4'>
+                  " . $product['Location'] . "
+              </div>
+              <div class='col-4'>
+                  " . $product['Price'] . "
+              </div> 
+          </div>         
       </div>
-    </div>
+      </div>
   ";
 }
 
