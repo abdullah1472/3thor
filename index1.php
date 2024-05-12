@@ -1,10 +1,7 @@
 <?php
 session_start();
 require 'contc.php'; // قم بتغيير 'contc.php' إلى اسم ملف اتصال قاعدة البيانات الخاص بك
-
 $defaultImagePath = "uploads/default.png"; // حدد مسار الصورة الافتراضية هنا
-
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
     // جلب بيانات المستخدم من الجلسة
     $userID = $_SESSION['UserID']; // تأكد من تغيير هذا إذا كان اسم المتغير المستخدم لديك مختلفًا
@@ -67,9 +64,6 @@ $stmtt->execute();
 $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-
-
-
 <?php
 //session_start();
 // التحقق من وجود متغير الجلسة الذي يحمل معرف المستخدم
@@ -295,8 +289,6 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
         </form>
     </div>
 </div>
-
-
 <script>
     // JavaScript function to open the popup
     function openPopup() {
@@ -309,34 +301,25 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     }
 </script>
 
-
-
-
-
           <!--     -->
-
       </div>
-      
-
-
-
       <div class="col-4">
-    <?php
-   // session_start(); // بدء الجلسة
+      <?php
+// session_start(); // تأكد من بدء الجلسة
 
-    function printWelcomeMessage() {
-        if (isset($_SESSION['user'])) {
-            $username = $_SESSION['user'];
-            echo "<p> $username</p>";
-            echo '<a href="about.php" class="readmore mb-4">عرض معلومات الحساب</a>';
-            echo '<a href="end_session.php" class="readmore border-danger bg-danger-subtle border-2 mb-4">تسجيل خروج</a>';
-        } else {
-            echo '<a href="login1.php" class="readmore mb-4">سجل دخول</a>';
-        }
+function printWelcomeMessage() {
+    if (isset($_SESSION['user'])) {
+        $username = $_SESSION['user'];
+        echo "<p> $username</p>";
+        echo '<a href="about.php" class="readmore mb-4">عرض معلومات الحساب</a>';
+        echo '<a href="end_session.php" class="readmore border-danger bg-danger-subtle border-2 mb-4">تسجيل خروج</a>';
+    } else {
+        echo '<a href="login1.php" class="readmore mb-4">سجل دخول</a>';
     }
+}
 
-    printWelcomeMessage();
-    ?>
+printWelcomeMessage();
+?>
 </div>
 
     </div>
@@ -364,9 +347,10 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
   
         <?php
 // استعلام لجلب بيانات المنتجات مع الصور المرتبطة بها
-$sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, GROUP_CONCAT(i.ImageDescription) AS Images
+$sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, GROUP_CONCAT(i.ImageDescription) AS Images, u.username
         FROM product p
-        LEFT JOIN image i ON p.ProductID = i.ProductID";
+        LEFT JOIN image i ON p.ProductID = i.ProductID
+        LEFT JOIN users u ON p.UserID = u.UserID"; // ربط مع جدول المستخدمين لجلب اسم المستخدم
 
 // إذا تم تحديد تصنيف، قم بإضافة شرط WHERE لتحديد الفئة
 if(isset($_GET['category']) && $_GET['category'] != '') {
@@ -416,7 +400,7 @@ foreach ($products as $product) {
       <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
       <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
           <div class='work-info'>
-              <h3>user</h3>
+          <h3>" . $product['username'] . "</h3> <!-- عرض اسم المستخدم المرتبط بالمنتج -->
               <span>" . $product['Category'] . "</span>
           </div>";
 
@@ -454,18 +438,8 @@ foreach ($products as $product) {
       </div>
   ";
 }
-
-
-
 ?>
 
-   
-   
-    
-    
-
-
-       
 
               <!-- التاريخ و السعر نهايته-->
           </div>
