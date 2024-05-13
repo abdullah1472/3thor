@@ -1,8 +1,9 @@
 <?php
 session_start();
 
+// التحقق مما إذا كان المستخدم مسجل دخوله
 if (!isset($_SESSION['UserID'])) {
-    header("Location: login.php");
+    header("Location: login1.php");
     exit();
 }
 
@@ -10,26 +11,27 @@ if (isset($_POST['product_id'])) {
     require 'contc.php';
 
     try {
-        // Start a transaction
+        // بدء معاملة
         $conn->beginTransaction();
 
-        // Delete associated images
+        // حذف الصور المرتبطة
         $stmt_delete_images = $conn->prepare("DELETE FROM image WHERE ProductID = ?");
         $stmt_delete_images->execute([$_POST['product_id']]);
 
-        // Delete the product
+        // حذف المنتج
         $stmt_delete_product = $conn->prepare("DELETE FROM product WHERE ProductID = ? AND UserID = ?");
         $stmt_delete_product->execute([$_POST['product_id'], $_SESSION['UserID']]);
 
-        // Commit the transaction
+        // إتمام المعاملة
         $conn->commit();
 
         header("Location: about.php");
         exit();
     } catch (PDOException $e) {
-        // Roll back the transaction on error
+        // التراجع عن المعاملة في حالة حدوث خطأ
         $conn->rollBack();
-        echo "Error: " . $e->getMessage();
+        error_log("Error: " . $e->getMessage()); // سجل الخطأ بدلاً من عرضها
+        echo "An error occurred while deleting the product. Please try again later."; // رسالة خطأ عامة
     }
 } else {
     header("Location: about.php");
