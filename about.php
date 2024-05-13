@@ -65,7 +65,19 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById("productPopup").style.display = "none";
         }
     </script>
+    
     <style>
+      body {
+    background-image: url('assets/img/bac5.jpg'); /* تعيين مسار الصورة */
+    background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+    background-position: center; /* محاذاة الصورة في الوسط */
+    background-repeat: no-repeat; /* عدم تكرار الصورة */
+    background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
+        }
+        .imgpo {
+          background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+          background-position: center; /* محاذاة الصورة في الوسط */
+        }
         .popup {
             display: none;
             position: fixed;
@@ -125,35 +137,15 @@ if (isset($_GET['registered']) && $_GET['registered'] === 'true') {
 }
 ?>
 
-<div class="collapse navbar-collapse custom-navmenu" id="main-navbar">
-    <div class="container py-2 py-md-5">
-        <div class="row align-items-start">
-            <div class="col-md-2">
-                <ul class="custom-menu">
-                    <li><a href="index1.php">Home</a></li>
-                    <li class="active"><a href="about.html">About Me</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="works.html">Works</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="col-md-6 d-none d-md-block  mr-auto">
-                <div class=" d-flex">
-                    <div></div>
-                </div>
-            </div>
-            <div class="col-md-4 d-none d-md-block">
-                <h3>Hire Me</h3>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam necessitatibus incidunt ut officiis explicabo inventore. <br> <a href="#">myemail@gmail.com</a></p>
-            </div>
-        </div>
-    </div>
-</div>
+
+
 
 <nav class="navbar navbar-light custom-navbar">
     <div class="container">
-        <a class="navbar-brand" href="index1.php">عثور</a>
-        <a href="#" class="burger" data-bs-toggle="collapse" data-bs-target="#main-navbar">
+    
+        <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="130" hight="130"></a>
+        
+        
             <span></span>
         </a>
     </div>
@@ -203,12 +195,16 @@ if (isset($_GET['registered']) && $_GET['registered'] === 'true') {
                 </div>
             </div>
 
-            <!-- عرض المنتجات -->
-            <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
+          
+    </section>
+</main>
+  <!-- عرض المنتجات -->
+  <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
+            
                 <h3>المنتجات</h3>
                 <?php if(!empty($products)): ?>
                     <?php foreach($products as $product): ?>
-                        <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
+                        <div class='item web col-sm-6 col-md-4 col-lg-2 mb-4'>
                             <a href='work-single.php?id=<?php echo $product['ProductID']; ?>' class='item-wrap fancybox'>
                                 <div class='work-info'>
                                     <h3><?php echo htmlspecialchars($user['UserName']); ?></h3> <!-- عرض اسم المستخدم المرتبط بالمنتج -->
@@ -225,6 +221,7 @@ if (count($images) > 0 && $images[0] != '') {
 } else {
     echo "<div class='product-image'>
             <img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'>
+            
         </div>";
 }
 ?>
@@ -263,11 +260,14 @@ if (count($images) > 0 && $images[0] != '') {
                                         <?php echo htmlspecialchars($product['Price']); ?>
                                     </div>
                                 </div>
+                                <div class='col-16'>  
                                 <form method="POST" action="delete_product.php" class="mt-2">
                                     <input type="hidden" name="product_id" value="<?php echo $product['ProductID']; ?>">
                                     <button type="submit" class="btn btn-danger btn-sm">حذف</button>
                                 </form>
+                                </div>  
                             </div>
+                            
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -275,9 +275,7 @@ if (count($images) > 0 && $images[0] != '') {
                 <?php endif; ?>
             </div>
         </div>
-    </section>
-</main>
-
+        </div>  
 <!-- Vendor JS Files -->
 <script src="assets/vendor/aos/aos.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
