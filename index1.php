@@ -1,66 +1,64 @@
 <?php
 session_start();
 require 'contc.php'; // قم بتغيير 'contc.php' إلى اسم ملف اتصال قاعدة البيانات الخاص بك
+
+// دالة للتحقق من حالة تسجيل الدخول
+function isLoggedIn() {
+  return isset($_SESSION['UserID']);
+}
+
 $defaultImagePath = "uploads/default.png"; // حدد مسار الصورة الافتراضية هنا
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
-    // جلب بيانات المستخدم من الجلسة
     $userID = $_SESSION['UserID']; // تأكد من تغيير هذا إذا كان اسم المتغير المستخدم لديك مختلفًا
 
-    // جلب بيانات المنتج من النموذج
-    $productName = $_POST['productName']; // كانت Title في السابق
-    $productDescription = $_POST['productDescription']; // كانت Description في السابق
-    $productPrice = $_POST['productPrice']; // كانت Price في السابق
-    $productLocation = $_POST['productLocation']; // كانت Category في السابق
-    $productType = $_POST['productType']; // كانت Location في السابق
+    $productName = $_POST['productName'];
+    $productDescription = $_POST['productDescription'];
+    $productPrice = $_POST['productPrice'];
+    $productLocation = $_POST['productLocation'];
+    $productType = $_POST['productType'];
     
-    // تحضير الاستعلام لإدراج المنتج في قاعدة البيانات
     $sql = "INSERT INTO product (Title, Description, Price, Location, Category, UserID) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$productName, $productDescription, $productPrice, $productLocation, $productType, $userID]);
     
-    // جلب معرف المنتج الجديد الذي تم إضافته
     $productID = $conn->lastInsertId();
-
-    // تحديد المسار الذي ستُرفع إليه الصور
     $targetDirectory = "uploads/";
 
-    // التحقق من وجود المجلد "uploads"، وإن لم يكن موجودًا يتم إنشاؤه
     if (!is_dir($targetDirectory)) {
         mkdir($targetDirectory, 0777, true);
     }
 
-    // تحميل كل صورة من النموذج وحفظها في المجلد "uploads"
     foreach ($_FILES['productImages']['tmp_name'] as $key => $tmp_name) {
         $imageName = $_FILES['productImages']['name'][$key];
         $imageTmpName = $_FILES['productImages']['tmp_name'][$key];
         $imagePath = $targetDirectory . $imageName;
 
-        // التحقق من نجاح عملية تحميل الصورة قبل إدراج اسم الصورة في قاعدة البيانات
         if (move_uploaded_file($imageTmpName, $imagePath)) {
-            // تحضير الاستعلام لإدراج اسم الصورة ومعرف المنتج المرتبط في جدول الصور
             $sql = "INSERT INTO image (ImageDescription, ProductID) VALUES (?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$imageName, $productID]);
         } else {
-            // في حالة فشل نقل الصورة
             echo "حدث خطأ أثناء تحميل الصورة.";
         }
     }
 
-    // إعادة التوجيه بعد إضافة المنتج بنجاح
-  header('Location: ' . $_SERVER['PHP_SELF']);
-  exit();
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
 }
 
-// إضافة الاستعلام هنا لجلب المنتجات وترتيبها
+// التحقق من وجود نص للبحث
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
+
 $sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, MIN(i.ImageDescription) as ImageDescription
         FROM product p
         LEFT JOIN image i ON p.ProductID = i.ProductID
+        WHERE p.Title LIKE ? OR p.Description LIKE ?
         GROUP BY p.ProductID
         ORDER BY p.DatePosted DESC";
 
 $stmtt = $conn->prepare($sql);
-$stmtt->execute();
+$stmtt->execute(['%' . $searchTerm . '%', '%' . $searchTerm . '%']);
 $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
@@ -109,78 +107,66 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
   ======================================================== -->
  <!-- Custom JavaScript -->
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
  <script>
-        $(document).ready(function(){
-            // عرض الـ alert بعد 3 ثواني
-            $(".alert").fadeTo(2000, 500).slideUp(500, function(){
-                $(".alert").slideUp(500);
-            });
+    $(document).ready(function(){
+        $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+            $(".alert").slideUp(500);
         });
-    </script>
+    });
+</script>
+
 <script>
-    // استخدم JavaScript للتمرير إلى الأعلى
     window.onload = function() {
         window.scrollTo(0, 0);
     }
 </script>
 
 <style>
-        /* Add your CSS styles here */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-        }
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
 
-        .popup-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-        }
+    
+    .popup-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+    }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
 
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .product-image img {
-    width: 200px; /* تحديد عرض ثابت للصور */
-    height: 200px; /* تحديد ارتفاع ثابت للصور */
-    object-fit: cover; /* جعل الصور تغطي العنصر بالكامل دون تشويهها */
-    /* يمكنك إضافة أي خصائص إضافية تريدها هنا */
-}
-
-
-    </style>
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .product-image img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
 
 
 </head>
 
 <body>
-
-
-
-
-
-
-
   <!-- ======= اليرت تسجيل الدخول ======= -->
 <?php
             if (isset($_GET['registered']) && $_GET['registered'] === 'true') {
@@ -247,14 +233,17 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
       <div class="row justify-content-start"> 
         <div class="row justify-content-between">
           <div class="col-4">
-
-
           <!--     -->
+          <?php
+    if (isLoggedIn()) {
+?>
+        <a href="#" onclick="openPopup()" class="readmore">لنشر</a>
+<?php
+    } else {
+        echo '<p>يجب عليك تسجيل الدخول أولاً لنشر المنتجات.</p>';
+    }
+?>
 
-
-
-          <a href="#" onclick="openPopup()" class="readmore">لنشر</a>
-         
 <div id="productPopup" class="popup">
     <div class="popup-content">
         <span class="close" onclick="closePopup()">&times;</span>
@@ -324,12 +313,15 @@ printWelcomeMessage();
 
     </div>
   </div>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="بحث" aria-label="Recipient's username" aria-describedby="basic-addon2">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button">Button</button>
-            </div>
-          </div>
+  <div class="input-group mb-3">
+    <form method="GET" action="">
+        <input type="text" class="form-control" name="search" placeholder="بحث" aria-label="بحث" aria-describedby="basic-addon2" value="<?php echo htmlspecialchars($searchTerm); ?>">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">بحث</button>
+        </div>
+    </form>
+</div>
+
 
            
           </div>
@@ -352,10 +344,26 @@ $sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePos
         LEFT JOIN image i ON p.ProductID = i.ProductID
         LEFT JOIN users u ON p.UserID = u.UserID"; // ربط مع جدول المستخدمين لجلب اسم المستخدم
 
+$conditions = [];
+$params = [];
+
 // إذا تم تحديد تصنيف، قم بإضافة شرط WHERE لتحديد الفئة
 if(isset($_GET['category']) && $_GET['category'] != '') {
     $category = $_GET['category'];
-    $sql .= " WHERE p.Category = :category";
+    $conditions[] = "p.Category = :category";
+    $params[':category'] = $category;
+}
+
+// إذا تم تحديد نص بحث، قم بإضافة شرط LIKE لتحديد المنتجات
+if(isset($_GET['search']) && $_GET['search'] != '') {
+    $searchTerm = '%' . $_GET['search'] . '%';
+    $conditions[] = "(p.Title LIKE :search OR p.Description LIKE :search)";
+    $params[':search'] = $searchTerm;
+}
+
+// دمج الشروط في جملة WHERE إذا كانت هناك شروط
+if (count($conditions) > 0) {
+    $sql .= " WHERE " . implode(" AND ", $conditions);
 }
 
 $sql .= " GROUP BY p.ProductID
@@ -364,9 +372,9 @@ $sql .= " GROUP BY p.ProductID
 // تنفيذ الاستعلام
 $stmtt = $conn->prepare($sql);
 
-// إذا تم تحديد تصنيف، قم بربط قيمة المتغير "category" مع البارامتر المستخدم في الاستعلام
-if(isset($_GET['category']) && $_GET['category'] != '') {
-    $stmtt->bindParam(':category', $category);
+// ربط القيم بالاستعلام
+foreach ($params as $key => &$val) {
+    $stmtt->bindParam($key, $val);
 }
 
 $stmtt->execute();
@@ -376,70 +384,69 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 // عرض البيانات
 foreach ($products as $product) {
-  // حساب الوقت المنقضي منذ العرض بالثواني
-  $displayTime = strtotime($product['DatePosted']);
-  $currentTime = time(); // وقت الآن بالثواني
-  $timeDiff = $currentTime - $displayTime;
+    // حساب الوقت المنقضي منذ العرض بالثواني
+    $displayTime = strtotime($product['DatePosted']);
+    $currentTime = time(); // وقت الآن بالثواني
+    $timeDiff = $currentTime - $displayTime;
 
-  // حساب الزمن المناسب بالدقائق أو الساعات أو الأيام
-  if ($timeDiff < 60) {
-      $timeAgo = "الآن";
-  } elseif ($timeDiff < 3600) {
-      $timeAgo = "قبل " . floor($timeDiff / 60) . " دقيقة";
-  } elseif ($timeDiff < 86400) {
-      $timeAgo = "قبل " . floor($timeDiff / 3600) . " ساعة";
-  } else {
-      $timeAgo = "قبل " . floor($timeDiff / 86400) . " يوم";
-  }
+    // حساب الزمن المناسب بالدقائق أو الساعات أو الأيام
+    if ($timeDiff < 60) {
+        $timeAgo = "الآن";
+    } elseif ($timeDiff < 3600) {
+        $timeAgo = "قبل " . floor($timeDiff / 60) . " دقيقة";
+    } elseif ($timeDiff < 86400) {
+        $timeAgo = "قبل " . floor($timeDiff / 3600) . " ساعة";
+    } else {
+        $timeAgo = "قبل " . floor($timeDiff / 86400) . " يوم";
+    }
 
-  // تقسيم الصور إلى مصفوفة
-  $images = explode(",", $product['Images']);
+    // تقسيم الصور إلى مصفوفة
+    $images = explode(",", $product['Images']);
 
-  echo "
-  <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
-      <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
-      <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
-          <div class='work-info'>
-          <h3>" . $product['username'] . "</h3> <!-- عرض اسم المستخدم المرتبط بالمنتج -->
-              <span>" . $product['Category'] . "</span>
-          </div>";
+    echo "
+    <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
+        <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
+        <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
+            <div class='work-info'>
+            <h3>" . $product['username'] . "</h3> <!-- عرض اسم المستخدم المرتبط بالمنتج -->
+                <span>" . $product['Category'] . "</span>
+            </div>";
 
-          // عرض الصورة الأولى أو الصورة الافتراضية إذا لم تكن هناك صور
-          if (count($images) > 0 && $images[0] != '') {
-              $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
-              echo "<div class='product-image'>
-                      <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'>
-                  </div>";
-          } else {
-              echo "<div class='product-image'>
-                      <img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'>
-                  </div>";
-          }
+            // عرض الصورة الأولى أو الصورة الافتراضية إذا لم تكن هناك صور
+            if (count($images) > 0 && $images[0] != '') {
+                $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
+                echo "<div class='product-image'>
+                        <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'>
+                    </div>";
+            } else {
+                echo "<div class='product-image'>
+                        <img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'>
+                    </div>";
+            }
 
-      echo "</a>
-      <div class='p-1 text-white bg-dark-subtle container text-center'>
-          <div class='row justify-content-around'>
-              <div class='col-4'>
-                  " . $timeAgo . " <!-- عرض الوقت المنقضي بصيغة مختصرة -->
-              </div>
-              <div class='col-4'>
-                  " . $product['Title'] . "     
-              </div>            
-          </div>
-          <div class='row justify-content-around'>
-              <div class='col-4'>
-                  " . $product['Location'] . "
-              </div>
-              <div class='col-4'>
-                  " . $product['Price'] . "
-              </div> 
-          </div>         
-      </div>
-      </div>
-  ";
+        echo "</a>
+        <div class='p-1 text-white bg-dark-subtle container text-center'>
+            <div class='row justify-content-around'>
+                <div class='col-4'>
+                    " . $timeAgo . " <!-- عرض الوقت المنقضي بصيغة مختصرة -->
+                </div>
+                <div class='col-4'>
+                    " . $product['Title'] . "     
+                </div>            
+            </div>
+            <div class='row justify-content-around'>
+                <div class='col-4'>
+                    " . $product['Location'] . "
+                </div>
+                <div class='col-4'>
+                    " . $product['Price'] . "
+                </div> 
+            </div>         
+        </div>
+        </div>
+    ";
 }
 ?>
-
 
               <!-- التاريخ و السعر نهايته-->
           </div>
