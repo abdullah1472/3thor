@@ -50,7 +50,8 @@ if (isset($_POST['send'])) {
     if ($data) {
         $_SESSION['user'] = $user; // تخزين اسم المستخدم في الجلسة
         
-        header("Location: login1.php"); // توجيه المستخدم إلى الصفحة الثانية
+        $_SESSION['reg_success'] = true;
+        header("Location: login.php"); // توجيه المستخدم إلى الصفحة الثانية
         exit;
     } else {
         echo 'حدث خطأ أثناء إضافة المستخدم.';
@@ -64,6 +65,7 @@ if (isset($_POST['send'])) {
 <head>
  <title></title>
 </head>
+
 
 <!-- Font Awesome -->
 <link
@@ -85,9 +87,18 @@ if (isset($_POST['send'])) {
   type="text/javascript"
   src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"
 ></script>
+<style>
+   body {
+    background-image: url('assets/img/bac5.jpg'); /* تعيين مسار الصورة */
+    background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+    background-position: center; /* محاذاة الصورة في الوسط */
+    background-repeat: no-repeat; /* عدم تكرار الصورة */
+    background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
+        }
+        </style>
 <body>
     
-<section class="vh-100" style="background-color: #eee;">
+<section class="vh-100" style="">
   <div class="container h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-lg-12 col-xl-11">
@@ -141,19 +152,14 @@ if (isset($_POST['send'])) {
                     </div>
                   </div>
 
-                  <div class="form-check d-flex justify-content-center mb-5">
-                    <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
-                    <label class="form-check-label" for="form2Example3">
-                      I agree all statements in <a href="#!">Terms of service</a>
-                    </label>
-                  </div>
 
-                  <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" name="send" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg">تسجيل</button>
-                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="submit" name="send" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg">دخول</button>
-                  </div>
-                  </div>
+
+          <div class="text-center text-lg-start mt-4 pt-2">
+            <button  type="submit" name="send" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+              style="padding-left: 2.5rem; padding-right: 2.5rem;">تسجيل</button>
+            <p class="small fw-bold mt-2 pt-1 mb-0">هل لديك حساب? <a href="login.php"
+                class="link-danger">دخول</a></p>
+          </div>
                   
 
                 </form>
