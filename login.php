@@ -21,9 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
     if ($result) {
         // تخزين اسم المستخدم في الجلسة
         $_SESSION['user'] = $user;
-        $_SESSION['UserID'] = $result['UserID'];
+        $_SESSION['UserID'] = $result['UserID'];      
         // توجيه المستخدم إلى الصفحة الأخرى
-        header("Location: index1.php");
+        $_SESSION['login_success'] = true;
+        header("Location: index.php");
+        
         exit;
     } else {
         echo "لم يتم العثور على مستخدم مطابق!";
@@ -40,10 +42,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css" rel="stylesheet" />
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>
+
+    <style>
+   body {
+    background-image: url('assets/img/bac5.jpg'); /* تعيين مسار الصورة */
+    background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+    background-position: center; /* محاذاة الصورة في الوسط */
+    background-repeat: no-repeat; /* عدم تكرار الصورة */
+    background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
+        }
+        </style>
+        <link rel="stylesheet" href="mycss2/css22.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function(){
+            // عرض الـ alert بعد 3 ثواني
+            $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+                $(".alert").slideUp(500);
+            });
+        });
+    </script>
 </head>
 
 <body>
-    <section class="vh-100" style="background-color: #eee;">
+     <!-- ======= اليرت تسجيل الدخول ======= -->
+<?php
+            if (isset($_SESSION['reg_success']) && $_SESSION['reg_success']) {
+              echo '
+              <div class="container">
+                      <div class="row justify-content-center mt-5">
+                          <div class="col-md-6">
+                              <div class="alert alert-success" role="alert">
+                                  تم أنشاء حساب جديد!
+                              </div>
+                          </div>
+                      </div>
+                  </div>>';
+                   // بعد عرض الإنذار، قم بحذفه من الجلسة لعدم عرضه مرة أخرى
+                   unset($_SESSION['reg_success']);
+            }
+?>
+    <section class="vh-100" style="">
         <div class="container h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-lg-12 col-xl-11">
@@ -61,7 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
                                                 <label class="form-label" for="form3Example1c">Your Name</label>
                                             </div>
                                         </div>
+                                    
 
+                  
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
                                             <div data-mdb-input-init class="form-outline flex-fill mb-0">
@@ -70,12 +111,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
                                             </div>
                                         </div>
 
-                                        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                            <button type="submit" name="send" class="btn btn-primary btn-lg">تسجيل دخول</button>
-                                            <div class="d-flex justify-content-center mx-5 mb-3 mb-lg-1">
-                                                <button type="button" onclick="window.location.href='reg.php'" class="btn btn-secondary text-dark btn-lg">إنشاء حساب</button>
-                                            </div>
-                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+            <!-- Checkbox -->
+            <div class="form-check mb-0">
+              <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
+              <label class="form-check-label" for="form2Example3">
+                Remember me
+              </label>
+            </div>
+            <a href="#!" class="text-body">Forgot password?</a>
+          </div>
+
+          <div class="text-center text-lg-start mt-4 pt-2">
+            <button  type="submit" name="send" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+              style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+            <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="reg.php"
+                class="link-danger">Register</a></p>
+          </div>
+
+
 
                                     </form>
                                 </div>
