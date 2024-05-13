@@ -9,42 +9,55 @@ function isLoggedIn() {
 
 $defaultImagePath = "uploads/default.png"; // حدد مسار الصورة الافتراضية هنا
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
+    // جلب بيانات المستخدم من الجلسة
     $userID = $_SESSION['UserID']; // تأكد من تغيير هذا إذا كان اسم المتغير المستخدم لديك مختلفًا
 
-    $productName = $_POST['productName'];
-    $productDescription = $_POST['productDescription'];
-    $productPrice = $_POST['productPrice'];
-    $productLocation = $_POST['productLocation'];
-    $productType = $_POST['productType'];
+    // جلب بيانات المنتج من النموذج
+    $productName = $_POST['productName']; // كانت Title في السابق
+    $productDescription = $_POST['productDescription']; // كانت Description في السابق
+    $productPrice = $_POST['productPrice']; // كانت Price في السابق
+    $productLocation = $_POST['productLocation']; // كانت Category في السابق
+    $productType = $_POST['productType']; // كانت Location في السابق
     
+    // تحضير الاستعلام لإدراج المنتج في قاعدة البيانات
     $sql = "INSERT INTO product (Title, Description, Price, Location, Category, UserID) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$productName, $productDescription, $productPrice, $productLocation, $productType, $userID]);
     
+    // جلب معرف المنتج الجديد الذي تم إضافته
     $productID = $conn->lastInsertId();
+
+    // تحديد المسار الذي ستُرفع إليه الصور
     $targetDirectory = "uploads/";
 
+    // التحقق من وجود المجلد "uploads"، وإن لم يكن موجودًا يتم إنشاؤه
     if (!is_dir($targetDirectory)) {
         mkdir($targetDirectory, 0777, true);
     }
 
+    // تحميل كل صورة من النموذج وحفظها في المجلد "uploads"
     foreach ($_FILES['productImages']['tmp_name'] as $key => $tmp_name) {
         $imageName = $_FILES['productImages']['name'][$key];
         $imageTmpName = $_FILES['productImages']['tmp_name'][$key];
         $imagePath = $targetDirectory . $imageName;
 
+        // التحقق من نجاح عملية تحميل الصورة قبل إدراج اسم الصورة في قاعدة البيانات
         if (move_uploaded_file($imageTmpName, $imagePath)) {
+            // تحضير الاستعلام لإدراج اسم الصورة ومعرف المنتج المرتبط في جدول الصور
             $sql = "INSERT INTO image (ImageDescription, ProductID) VALUES (?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$imageName, $productID]);
         } else {
+            // في حالة فشل نقل الصورة
             echo "حدث خطأ أثناء تحميل الصورة.";
         }
     }
 
-    header('Location: ' . $_SERVER['PHP_SELF']);
-    exit();
+    // إعادة التوجيه بعد إضافة المنتج بنجاح
+  header('Location: ' . $_SERVER['PHP_SELF']);
+  exit();
 }
 
 // التحقق من وجود نص للبحث
@@ -62,14 +75,7 @@ $stmtt->execute(['%' . $searchTerm . '%', '%' . $searchTerm . '%']);
 $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-<?php
-//session_start();
-// التحقق من وجود متغير الجلسة الذي يحمل معرف المستخدم
-//if (!isset($_SESSION['UserID'])) {
-    // إذا لم يكن المستخدم قد سجل الدخول، قم بتوجيهه إلى صفحة تسجيل الدخول
-//    echo"ablshhhhhhh";
-//}
-?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -95,128 +101,114 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: MyPortfolio
-  * Template URL: https://bootstrapmade.com/myportfolio-bootstrap-portfolio-website-template/
-  * Updated: Mar 17 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
- <!-- Custom JavaScript -->
+  
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
- <script>
-    $(document).ready(function(){
-        $(".alert").fadeTo(2000, 500).slideUp(500, function(){
-            $(".alert").slideUp(500);
-        });
-    });
-</script>
 
+ <script>
+        $(document).ready(function(){
+            // عرض الـ alert بعد 3 ثواني
+            $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+                $(".alert").slideUp(500);
+            });
+        });
+    </script>
 <script>
+    // استخدم JavaScript للتمرير إلى الأعلى
     window.onload = function() {
         window.scrollTo(0, 0);
     }
 </script>
 
 <style>
-    .popup {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-    }
+   body {
+    background-image: url('assets/img/bac5.jpg'); /* تعيين مسار الصورة */
+    background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+    background-position: center; /* محاذاة الصورة في الوسط */
+    background-repeat: no-repeat; /* عدم تكرار الصورة */
+    background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
+        }
+        .imgpo {
+          background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+          background-position: center; /* محاذاة الصورة في الوسط */
+        }
+        /* Add your CSS styles here */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
 
-    
-    .popup-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 600px;
-    }
+        .popup-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+        }
 
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    .product-image img {
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-    }
-</style>
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .product-image img {
+    width: 200px; /* تحديد عرض ثابت للصور */
+    height: 200px; /* تحديد ارتفاع ثابت للصور */
+    object-fit: cover; /* جعل الصور تغطي العنصر بالكامل دون تشويهها */
+    /* يمكنك إضافة أي خصائص إضافية تريدها هنا */
+}
+
+
+    </style>
 
 
 </head>
 
 <body>
+
+
+
+
+
+
+
   <!-- ======= اليرت تسجيل الدخول ======= -->
 <?php
-            if (isset($_GET['registered']) && $_GET['registered'] === 'true') {
+            if (isset($_SESSION['login_success']) && $_SESSION['login_success']) {
               echo '
               <div class="container">
                       <div class="row justify-content-center mt-5">
                           <div class="col-md-6">
                               <div class="alert alert-success" role="alert">
-                                  تم إنشاء الحساب بنجاح!
+                                  تم تسجيل الدخول!
                               </div>
                           </div>
                       </div>
                   </div>>';
+                   // بعد عرض الإنذار، قم بحذفه من الجلسة لعدم عرضه مرة أخرى
+                   unset($_SESSION['login_success']);
             }
 ?>
-  <!-- ======= Navbar ======= -->
-  <div class="collapse navbar-collapse custom-navmenu" id="main-navbar">
-    <div class="container py-2 py-md-5">
-      <div class="row align-items-start">
-        <div class="col-md-2">
-          <ul class="custom-menu">
-            <li class="active"><a href="index.html">Home</a></li>
-            <li><a href="about.html">About Me</a></li>
-            <li><a href="services.html">Services</a></li>
-            <li><a href="works.html">Works</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
-        </div>
-        <div class="col-md-6 d-none d-md-block  mr-auto">
-          <div class=" d-flex">
-            
-            <div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 d-none d-md-block">
-          <h3>Hire Me</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam necessitatibus incidunt ut officiisexplicabo inventore. <br> <a href="#">myemail@gmail.com</a></p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
+  
   <nav class="navbar navbar-light custom-navbar">
     <div class="container">
-      <a class="navbar-brand" href="#">عثور</a>
-      <a href="#" class="burger" data-bs-toggle="collapse" data-bs-target="#main-navbar">
-        <span></span>
-      </a>
+    <a class="navbar-brand" href="#"><img class="navbar-brand" src="assets/img/logoname2.png" width="130" hight="130"></a>
     </div>
   </nav>
 
@@ -233,6 +225,8 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
       <div class="row justify-content-start"> 
         <div class="row justify-content-between">
           <div class="col-4">
+
+
           <!--     -->
           <?php
     if (isLoggedIn()) {
@@ -243,7 +237,6 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
         echo '<p>يجب عليك تسجيل الدخول أولاً لنشر المنتجات.</p>';
     }
 ?>
-
 <div id="productPopup" class="popup">
     <div class="popup-content">
         <span class="close" onclick="closePopup()">&times;</span>
@@ -278,6 +271,8 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
         </form>
     </div>
 </div>
+
+
 <script>
     // JavaScript function to open the popup
     function openPopup() {
@@ -290,25 +285,28 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     }
 </script>
 
-          <!--     -->
       </div>
+      
+
+
+
       <div class="col-4">
-      <?php
-// session_start(); // تأكد من بدء الجلسة
+    <?php
+   // session_start(); // بدء الجلسة
 
-function printWelcomeMessage() {
-    if (isset($_SESSION['user'])) {
-        $username = $_SESSION['user'];
-        echo "<p> $username</p>";
-        echo '<a href="about.php" class="readmore mb-4">عرض معلومات الحساب</a>';
-        echo '<a href="end_session.php" class="readmore border-danger bg-danger-subtle border-2 mb-4">تسجيل خروج</a>';
-    } else {
-        echo '<a href="login1.php" class="readmore mb-4">سجل دخول</a>';
+    function printWelcomeMessage() {
+        if (isset($_SESSION['user'])) {
+            $username = $_SESSION['user'];
+            echo "<p> $username</p>";
+            echo '<a href="about.php" class="readmore mb-4">عرض معلومات الحساب</a>';
+            echo '<a href="end_session.php" class="readmore border-danger bg-danger-subtle border-2 mb-4">تسجيل خروج</a>';
+        } else {
+            echo '<a href="login.php" class="readmore mb-4">سجل دخول</a>';
+        }
     }
-}
 
-printWelcomeMessage();
-?>
+    printWelcomeMessage();
+    ?>
 </div>
 
     </div>
@@ -321,7 +319,6 @@ printWelcomeMessage();
         </div>
     </form>
 </div>
-
 
            
           </div>
@@ -336,7 +333,6 @@ printWelcomeMessage();
         </div>
 
         
-  
         <?php
 // استعلام لجلب بيانات المنتجات مع الصور المرتبطة بها
 $sql = "SELECT p.ProductID, p.UserID, p.Title, p.Description, p.Price, p.DatePosted, p.Location, p.Category, GROUP_CONCAT(i.ImageDescription) AS Images, u.username
@@ -448,6 +444,15 @@ foreach ($products as $product) {
 }
 ?>
 
+
+   
+   
+    
+    
+
+
+       
+
               <!-- التاريخ و السعر نهايته-->
           </div>
         </div>
@@ -459,136 +464,15 @@ foreach ($products as $product) {
       <div class="container">
         <div class="row justify-content-center text-center mb-4">
           <div class="col-5">
-            <h3 class="h3 heading">My Clients</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
+            <h3 class="h3 heading">--------</h3>
+            <p>------------------------------------------------.</p>
           </div>
         </div>
-        <div class="row">
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-adobe.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-uber.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-apple.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-netflix.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-nike.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-google.png" alt="Image" class="img-fluid"></a>
-          </div>
-
         </div>
-      </div>
+      
     </section><!-- End Clients Section -->
 
-    <!-- ======= Services Section ======= -->
-    <section class="section services">
-      <div class="container">
-        <div class="row justify-content-center text-center mb-4">
-          <div class="col-5">
-            <h3 class="h3 heading">My Services</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
-          </div>
-        </div>
-        <div class="row">
-
-          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-            <i class="bi bi-card-checklist"></i>
-            <h4 class="h4 mb-2">Web Design</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
-            <ul class="list-unstyled list-line">
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing</li>
-              <li>Non pariatur nisi</li>
-              <li>Magnam soluta quod</li>
-              <li>Lorem ipsum dolor</li>
-              <li>Cumque quae aliquam</li>
-            </ul>
-          </div>
-          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-            <i class="bi bi-binoculars"></i>
-            <h4 class="h4 mb-2">Mobile Applications</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
-            <ul class="list-unstyled list-line">
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing</li>
-              <li>Non pariatur nisi</li>
-              <li>Magnam soluta quod</li>
-              <li>Lorem ipsum dolor</li>
-              <li>Cumque quae aliquam</li>
-            </ul>
-          </div>
-          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-            <i class="bi bi-brightness-high"></i>
-            <h4 class="h4 mb-2">Graphic Design</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
-            <ul class="list-unstyled list-line">
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing</li>
-              <li>Non pariatur nisi</li>
-              <li>Magnam soluta quod</li>
-              <li>Lorem ipsum dolor</li>
-              <li>Cumque quae aliquam</li>
-            </ul>
-          </div>
-          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-            <i class="bi bi-calendar4-week"></i>
-            <h4 class="h4 mb-2">SEO</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
-            <ul class="list-unstyled list-line">
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing</li>
-              <li>Non pariatur nisi</li>
-              <li>Magnam soluta quod</li>
-              <li>Lorem ipsum dolor</li>
-              <li>Cumque quae aliquam</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section><!-- End Services Section -->
-
-    <!-- ======= Testimonials Section ======= -->
-    <section class="section pt-0">
-      <div class="container">
-
-        <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="100">
-          <div class="swiper-wrapper">
-
-            <div class="swiper-slide">
-              <div class="testimonial-wrap">
-                <div class="testimonial">
-                  <img src="assets/img/person_1.jpg" alt="Image" class="img-fluid">
-                  <blockquote>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam necessitatibus incidunt ut officiis
-                      explicabo inventore.</p>
-                  </blockquote>
-                  <p>&mdash; Jean Hicks</p>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-wrap">
-                <div class="testimonial">
-                  <img src="assets/img/person_2.jpg" alt="Image" class="img-fluid">
-                  <blockquote>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam necessitatibus incidunt ut officiis
-                      explicabo inventore.</p>
-                  </blockquote>
-                  <p>&mdash; Chris Stanworth</p>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-          </div>
-          <div class="swiper-pagination"></div>
-        </div>
-
-      </div>
-    </section><!-- End Testimonials Section -->
+   
 
   </main><!-- End #main -->
 
@@ -597,16 +481,8 @@ foreach ($products as $product) {
     <div class="container">
       <div class="row">
         <div class="col-sm-6">
-          <p class="mb-1">&copy; Copyright MyPortfolio. All Rights Reserved</p>
-          <div class="credits">
-            <!--
-            All the links in the footer should remain intact.
-            You can delete the links only if you purchased the pro version.
-            Licensing information: https://bootstrapmade.com/license/
-            Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=MyPortfolio
-          -->
-            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-          </div>
+        <p class="mb-1">&copy; Copyright. All Rights Reserved</p>
+          
         </div>
         <div class="col-sm-6 social text-md-end">
           <a href="#"><span class="bi bi-twitter"></span></a>
@@ -629,6 +505,14 @@ foreach ($products as $product) {
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <!-- تضمين مكتبة Bootstrap JS من CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- تضمين مكتبة jQuery من CDN -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- تضمين ملف JavaScript مخصص -->
+<script src="scripttt.js"></script>
+</body>
 
 </body>
 
