@@ -57,6 +57,17 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
     <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <style>
+         body {
+    background-image: url('assets/img/bac5.jpg'); /* تعيين مسار الصورة */
+    background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+    background-position: center; /* محاذاة الصورة في الوسط */
+    background-repeat: no-repeat; /* عدم تكرار الصورة */
+    background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
+        }
+        .imgpo {
+          background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
+          background-position: center; /* محاذاة الصورة في الوسط */
+        }
         .product-image {
             margin-bottom: 1rem;
             max-width: 100%;
@@ -84,10 +95,8 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 <body>
     <nav class="navbar navbar-light custom-navbar">
         <div class="container">
-            <a class="navbar-brand" href="index1.php">عثور</a>
-            <a href="#" class="burger" data-bs-toggle="collapse" data-bs-target="#main-navbar">
-                <span></span>
-            </a>
+        <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="130" hight="130"></a>
+            
         </div>
     </nav>
     <main id="main">
@@ -150,8 +159,8 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
         <div class="container">
             <div class="row">
                 <div class="col-sm-6">
-                    <p class="mb-1">&copy; Copyright MyPortfolio. All Rights Reserved</p>
-                    <div class="credits">Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a></div>
+                    <p class="mb-1">&copy; Copyright. All Rights Reserved</p>
+                    
                 </div>
                 <div class="col-sm-6 social text-md-end">
                     <a href="#"><span class="bi bi-twitter"></span></a>
