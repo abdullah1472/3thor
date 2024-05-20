@@ -2,12 +2,12 @@
 require 'contc.php';
 
 if (!isset($_GET['id'])) {
-    header('Location: index1.php');
+    header('Location: index.php');
     exit();
 }
 
 $productID = $_GET['id'];
-echo "Product ID: " . $productID;
+//echo "Product ID: " . $productID;
 
 // تعديل استعلام SQL لجلب بيانات البائع مع المنتج
 $sqlProduct = "
@@ -95,7 +95,7 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 <body>
     <nav class="navbar navbar-light custom-navbar">
         <div class="container">
-        <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="130" hight="130"></a>
+        <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="230" hight="230"></a>
             
         </div>
     </nav>
