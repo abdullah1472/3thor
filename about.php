@@ -289,7 +289,10 @@ if (isset($_SESSION['error_message'])) {
         }
     });
 </script>
-
+<div class="col-md-3 mb-5 mb-md-0" data-aos="fade-up">
+                        <p><img src="assets/img/popo.png" alt="Image" class="img-fluid"></p>
+                     
+                    </div>
 </section>
 </main>
 
