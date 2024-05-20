@@ -3,7 +3,7 @@ session_start();
 
 // التحقق مما إذا كان المستخدم مسجل دخوله
 if (!isset($_SESSION['UserID'])) {
-    header("Location: login1.php");
+    header("Location: login.php");
     exit();
 }
 
