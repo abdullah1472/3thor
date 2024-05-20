@@ -6,7 +6,7 @@ require 'contc.php'; // توصيل قاعدة البيانات
 
 // التحقق من وجود معرف المستخدم في الجلسة
 if (!isset($_SESSION['UserID'])) {
-    header('Location: login1.php'); // توجيه إلى صفحة الدخول إذا لم يكن المستخدم مسجلاً
+    header('Location: login.php'); // توجيه إلى صفحة الدخول إذا لم يكن المستخدم مسجلاً
     exit();
 }
 
