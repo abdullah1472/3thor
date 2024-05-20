@@ -28,10 +28,13 @@ $stmtt->execute();
 $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>MyPortfolio Bootstrap Template - About</title>
@@ -46,6 +49,8 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
             $(".alert").fadeTo(2000, 500).slideUp(500, function(){
@@ -57,8 +62,15 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             window.scrollTo(0, 0);
         }
 
-        function openPopup() {
-            document.getElementById("productPopup").style.display = "block";
+
+        function openEditPopup(productId, title, description, price, location, category) {
+            document.getElementById("editProductId").value = productId;
+            document.getElementById("editTitle").value = title;
+            document.getElementById("editDescription").value = description;
+            document.getElementById("editPrice").value = price;
+            document.getElementById("editLocation").value = location;
+            document.getElementById("editCategory").value = category;
+            document.getElementById("editPopup").style.display = "block";
         }
 
         function closePopup() {
@@ -67,17 +79,18 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     </script>
     
     <style>
-      body {
-    background-image: url('assets/img/bac5.jpg'); /* تعيين مسار الصورة */
-    background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
-    background-position: center; /* محاذاة الصورة في الوسط */
-    background-repeat: no-repeat; /* عدم تكرار الصورة */
-    background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
+        body {
+            background-image: url('assets/img/bac5.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed;
         }
         .imgpo {
-          background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
-          background-position: center; /* محاذاة الصورة في الوسط */
-        }
+  background-size: cover;
+  background-position: center;
+  height: 100%; /* Set the height of the image container */
+}
         .popup {
             display: none;
             position: fixed;
@@ -88,7 +101,6 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 9999;
         }
-
         .popup-content {
             background-color: #fefefe;
             margin: 15% auto;
@@ -97,55 +109,90 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             width: 80%;
             max-width: 600px;
         }
-
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
-
         .close:hover,
         .close:focus {
             color: black;
             text-decoration: none;
             cursor: pointer;
         }
+        
+       
+.product-image.imgpo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure the image container takes the full width */
+    height: 200px; /* Set the desired height */
+}
 
-        .product-image img {
-            width: 200px;
-            height: 200px;
-            object-fit: cover;
+.product-image.imgpo img {
+    max-width: 100%; /* Ensure the image does not exceed the container width */
+    max-height: 100%; /* Ensure the image does not exceed the container height */
+}
+.text-right {
+            text-align: right !important;
         }
+
     </style>
 </head>
 
 <body>
 
 <?php
-if (isset($_GET['registered']) && $_GET['registered'] === 'true') {
-    echo '
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-6">
-                <div class="alert alert-success" role="alert">
-                    تم إنشاء الحساب بنجاح!
-                </div>
-            </div>
-        </div>
-    </div>';
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
+
+if (isset($_SESSION['success_message'])) {
+    echo'
+              <div class="container">
+                      <div class="row justify-content-center mt-5">
+                          <div class="col-md-6">
+                              <div id="success-alert"  class="alert alert-success" role="alert">
+                              ' . $_SESSION['success_message'] . '
+                              </div>
+                          </div>
+                      </div>
+                  </div>';
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    echo'
+              <div class="container">
+                      <div class="row justify-content-center mt-5">
+                          <div class="col-md-6">
+                              <div id="error-alert" class="alert alert-danger" role="alert">
+                              ' . $_SESSION['error_message'] . '
+                              </div>
+                          </div>
+                      </div>
+                  </div>';
+    unset($_SESSION['error_message']);
+}
+
 ?>
-
-
-
+<script>
+    setTimeout(function() {
+        var successAlert = document.getElementById('success-alert');
+        if (successAlert) {
+            successAlert.style.display = 'none';
+        }
+        var errorAlert = document.getElementById('error-alert');
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+        }
+    }, 3000);
+</script>
 
 <nav class="navbar navbar-light custom-navbar">
     <div class="container">
-    
-        <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="130" hight="130"></a>
-        
-        
+        <a class="navbar-brand" href="index1.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="230" hight="230"></a>
             <span></span>
         </a>
     </div>
@@ -156,126 +203,199 @@ if (isset($_GET['registered']) && $_GET['registered'] === 'true') {
         <div class="container">
             <div class="row mb-5 align-items-end">
                 <div class="col-md-6" data-aos="fade-up">
-                    <h2>About Me</h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4 ml-auto order-2" data-aos="fade-up">
-                    <div class="form-group">
-                        <form method="POST" action="update_profile.php">
-                            <label for="username">اسم المستخدم:</label>
-                            <input type="text" class="form-control disabled" id="username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" disabled>
-                        </div>
-                        <div class="d-flex mb-1">
-                            <div class="form-group">
-                                <label for="email">البريد الإلكتروني:</label>
-                                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['Email']); ?>" <?php if(isset($entered_password) && $entered_password == $stored_password) echo "enabled"; ?>>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">رقم الجوال:</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($user['Phone']); ?>" <?php if(isset($entered_password) && $entered_password == $stored_password) echo "enabled"; ?>>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">كلمة المرور:</label>
-                            <input type="password" class="form-control" id="password" name="password" value="<?php echo htmlspecialchars($user['Password']); ?>" required readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirm_password">تأكيد كلمة المرور:</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
-                        </form>
-                    </div>
+                    <h2>معلوماتي</h2>
+                
+            
 
-                    <div class="col-md-3 mb-5 mb-md-0" data-aos="fade-up">
+            <div class="form-group">
+            <div class="form-group">
+                <label for="username">اسم المستخدم:</label>
+                <input type="text" class="form-control border border-light col-md-5" id="username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" disabled>
+            </div>
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" class="form-control border border-light col-md-5" id="email" name="email" value="<?php echo htmlspecialchars($user['Email']); ?>" disabled>
+            </div>
+            <div class="form-group">
+                <label for="phone">رقم الجوال:</label>
+                <input type="tel" class="form-control border border-light col-md-5" id="phone" name="phone" value="<?php echo htmlspecialchars($user['Phone']); ?>" disabled>
+            </div>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">تحديث البيانات</button>
+        </div>
+    </div>
+
+    <!-- نافذة منبثقة لتحديث البيانات -->
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">تحديث البيانات</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+    <form method="POST" action="update_profile.php">
+        <div class="form-group">
+            <label for="modal_username">اسم المستخدم:</label>
+            <input type="text" class="form-control" id="modal_username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="modal_email">البريد الإلكتروني:</label>
+            <input type="email" class="form-control" id="modal_email" name="email" value="<?php echo htmlspecialchars($user['Email']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="modal_phone">رقم الجوال:</label>
+            <input type="tel" class="form-control" id="modal_phone" name="phone" value="<?php echo htmlspecialchars($user['Phone']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="modal_password">كلمة المرور الحالية:</label>
+            <input type="password" class="form-control" id="modal_password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="modal_new_password">كلمة المرور الجديدة:</label>
+            <input type="password" class="form-control" id="modal_new_password" name="new_password">
+        </div>
+        <div class="form-group">
+            <label for="modal_confirm_new_password">تأكيد كلمة المرور الجديدة:</label>
+            <input type="password" class="form-control" id="modal_confirm_new_password" name="confirm_new_password">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+        </div>
+    </form>
+    
+</div>
+
+            </div>
+            
+        </div>
+        
+    </div>
+    <div class="col-md-3 mb-5 mb-md-0" data-aos="fade-up">
                         <p><img src="assets/img/popo.png" alt="Image" class="img-fluid"></p>
-                        <p><a href="#" class="readmore">my</a></p>
+                     
                     </div>
-                </div>
-            </div>
-
-          
-    </section>
+</section>
 </main>
-  <!-- عرض المنتجات -->
-  <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
-            
-                <h3>المنتجات</h3>
-                <?php if(!empty($products)): ?>
-                    <?php foreach($products as $product): ?>
-                        <div class='item web col-sm-6 col-md-4 col-lg-2 mb-4'>
-                            <a href='work-single.php?id=<?php echo $product['ProductID']; ?>' class='item-wrap fancybox'>
-                                <div class='work-info'>
-                                    <h3><?php echo htmlspecialchars($user['UserName']); ?></h3> <!-- عرض اسم المستخدم المرتبط بالمنتج -->
-                                    <span><?php echo htmlspecialchars($product['Category']); ?></span>
-                                </div>
-                                <?php
-// التأكد من أن الصورة الأولى موجودة وليست فارغة
-$images = explode(",", $product['ImageDescription']);
-if (count($images) > 0 && $images[0] != '') {
-    $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
-    echo "<div class='product-image'>
-            <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'>
-        </div>";
-} else {
-    echo "<div class='product-image'>
-            <img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'>
-            
-        </div>";
-}
-?>
 
-                            </a>
-                            <div class='p-1 text-white bg-dark-subtle container text-center'>
-                                <div class='row justify-content-around'>
-                                    <div class='col-4'>
-                                        <?php
-                                        if (!empty($product['DatePosted'])) {
-                                            $displayTime = strtotime($product['DatePosted']);
-                                            $currentTime = time();
-                                            $timeDiff = $currentTime - $displayTime;
-                                            if ($timeDiff < 60) {
-                                                $timeAgo = "الآن";
-                                            } elseif ($timeDiff < 3600) {
-                                                $timeAgo = "قبل " . floor($timeDiff / 60) . " دقيقة";
-                                            } elseif ($timeDiff < 86400) {
-                                                $timeAgo = "قبل " . floor($timeDiff / 3600) . " ساعة";
-                                            } else {
-                                                $timeAgo = "قبل " . floor($timeDiff / 86400) . " يوم";
-                                            }
-                                            echo $timeAgo;
-                                        }
-                                        ?>
-                                    </div>
-                                    <div class='col-4'>
-                                        <?php echo htmlspecialchars($product['Title']); ?>
-                                    </div>
-                                </div>
-                                <div class='row justify-content-around'>
-                                    <div class='col-4'>
-                                        <?php echo htmlspecialchars($product['Location']); ?>
-                                    </div>
-                                    <div class='col-4'>
-                                        <?php echo htmlspecialchars($product['Price']); ?>
-                                    </div>
-                                </div>
-                                <div class='col-16'>  
-                                <form method="POST" action="delete_product.php" class="mt-2">
-                                    <input type="hidden" name="product_id" value="<?php echo $product['ProductID']; ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm">حذف</button>
-                                </form>
-                                </div>  
-                            </div>
+<!-- عرض المنتجات -->
+<div class="container">
+    <div class="row justify-content-md-center">
+    <div class="col col-lg-1">
+
+<h3 style="text-decoration: underline;" >منتجاتي</h3>
+</div>
+</div>
+</div>
+<div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
+   
+    <?php if(!empty($products)): ?>
+        <?php foreach($products as $product): ?>
+            <div class='item web col-sm-6 col-md-4 col-lg-2 mb-4'>
+                <a href='work-single.php?id=<?php echo $product['ProductID']; ?>' class='item-wrap fancybox'>
+                    <div class='work-info'>
+                        <h3><?php echo htmlspecialchars($user['UserName']); ?></h3>
+                        <span><?php echo htmlspecialchars($product['Category']); ?></span>
+                    </div>
+                    <?php
+                    $images = explode(",", $product['ImageDescription']);
+                    if (count($images) > 0 && $images[0] != '') {
+                        $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
+                        echo "<div class='product-image imgpo'>
+                        <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'style='width:100%;'>
+                    </div>";
+                    } else {
+                        echo "<div class='product-image imgpo'><img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'></div>";
+                    }
+                    ?>
+                </a>
+                <div class='p-1 text-white bg-dark-subtle container text-center'>
+                    <div class='row justify-content-around'>
+                        <div class='col-4'>
+                            <?php
+                            if (!empty($product['DatePosted'])) {
+                                $displayTime = strtotime($product['DatePosted']);
+                                $currentTime = time();
+                                $timeDiff = $currentTime - $displayTime;
+                                if ($timeDiff < 60) {
+                                    $timeAgo = "الآن";
+                                } elseif ($timeDiff < 3600) {
+                                    $timeAgo = "قبل " . floor($timeDiff / 60) . " دقيقة";
+                                } elseif ($timeDiff < 86400) {
+                                    $timeAgo = "قبل " . floor($timeDiff / 3600) . " ساعة";
+                                } else {
+                                    $timeAgo = "قبل " . floor($timeDiff / 86400) . " يوم";
+                                }
+                                echo $timeAgo;
+                            }
+                            ?>
+                        </div>
+                        <div class='col-4'>
+                            <?php echo htmlspecialchars($product['Title']); ?>
+                        </div>
+                    </div>
+                    <div class='row justify-content-around'>
+                        <div class='col-4'>
+                            <?php echo htmlspecialchars($product['Location']); ?>
+                        </div>
+                        <div class='col-4'>
+                            <?php echo htmlspecialchars($product['Price']); ?>
+                        </div>
+                    </div>
+                    <div class='row justify-content-around'>
+                        <div class='col-6'>
+                        
+                            <form method="POST" action="delete_product.php" >
+                                <button type="submit" class="btn btn-danger btn-sm">حذف</button>
+                                <input type="hidden" name="product_id" value="<?php echo $product['ProductID']; ?>">
+                            </form>
                             
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p>لا توجد منتجات.</p>
-                <?php endif; ?>
+                        <div class='col-6'>
+                            <button class="btn btn-primary btn-sm" onclick="openEditPopup('<?php echo $product['ProductID']; ?>', '<?php echo htmlspecialchars(addslashes($product['Title'])); ?>', '<?php echo htmlspecialchars(addslashes($product['Description'])); ?>', '<?php echo $product['Price']; ?>', '<?php echo htmlspecialchars(addslashes($product['Location'])); ?>', '<?php echo htmlspecialchars(addslashes($product['Category'])); ?>')">تعديل</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        </div>  
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>لا توجد منتجات.</p>
+    <?php endif; ?>
+</div>
+
+<!-- Popup for editing product -->
+<div id="editPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeEditPopup()">&times;</span>
+        <form method="POST" action="edit_product.php">
+            <input type="hidden" name="product_id" id="editProductId">
+            <div class="form-group">
+                <label for="editTitle">العنوان:</label>
+                <input type="text" class="form-control" id="editTitle" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="editDescription">الوصف:</label>
+                <textarea class="form-control" id="editDescription" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editPrice">السعر:</label>
+                <input type="double" class="form-control" id="editPrice" name="price" required>
+            </div>
+            <div class="form-group">
+                <label for="editLocation">الموقع:</label>
+                <input type="text" class="form-control" id="editLocation" name="location" required>
+            </div>
+            <div class="form-group">
+                <label for="editCategory">الفئة:</label>
+                <input type="text" class="form-control" id="editCategory" name="category" required readonly>
+            </div>
+            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+        </form>
+    </div>
+</div>
+
 <!-- Vendor JS Files -->
 <script src="assets/vendor/aos/aos.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
