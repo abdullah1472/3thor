@@ -223,60 +223,73 @@ if (isset($_SESSION['error_message'])) {
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">تحديث البيانات</button>
         </div>
     </div>
-
     <!-- نافذة منبثقة لتحديث البيانات -->
     <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="updateModalLabel">تحديث البيانات</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-    <form method="POST" action="update_profile.php">
-        <div class="form-group">
-            <label for="modal_username">اسم المستخدم:</label>
-            <input type="text" class="form-control" id="modal_username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" required>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">تحديث البيانات</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateForm" method="POST" action="update_profile.php">
+                    <div class="form-group">
+                        <label for="modal_username">اسم المستخدم:</label>
+                        <input type="text" class="form-control" id="modal_username" name="username" value="<?php echo htmlspecialchars($user['UserName']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_email">البريد الإلكتروني:</label>
+                        <input type="email" class="form-control" id="modal_email" name="email" value="<?php echo htmlspecialchars($user['Email']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_phone">رقم الجوال:</label>
+                        <input type="tel" class="form-control" id="modal_phone" name="phone" value="<?php echo htmlspecialchars($user['Phone']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_password">كلمة المرور الحالية:</label>
+                        <input type="password" class="form-control" id="modal_password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_new_password">كلمة المرور الجديدة:</label>
+                        <input type="password" class="form-control" id="modal_new_password" name="new_password">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_confirm_new_password">تأكيد كلمة المرور الجديدة:</label>
+                        <input type="password" class="form-control" id="modal_confirm_new_password" name="confirm_new_password">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="modal_email">البريد الإلكتروني:</label>
-            <input type="email" class="form-control" id="modal_email" name="email" value="<?php echo htmlspecialchars($user['Email']); ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="modal_phone">رقم الجوال:</label>
-            <input type="tel" class="form-control" id="modal_phone" name="phone" value="<?php echo htmlspecialchars($user['Phone']); ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="modal_password">كلمة المرور الحالية:</label>
-            <input type="password" class="form-control" id="modal_password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label for="modal_new_password">كلمة المرور الجديدة:</label>
-            <input type="password" class="form-control" id="modal_new_password" name="new_password">
-        </div>
-        <div class="form-group">
-            <label for="modal_confirm_new_password">تأكيد كلمة المرور الجديدة:</label>
-            <input type="password" class="form-control" id="modal_confirm_new_password" name="confirm_new_password">
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
-            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
-        </div>
-    </form>
-    
+    </div>
 </div>
 
-            </div>
-            
-        </div>
-        
-    </div>
-    <div class="col-md-3 mb-5 mb-md-0" data-aos="fade-up">
-                        <p><img src="assets/img/popo.png" alt="Image" class="img-fluid"></p>
-                     
-                    </div>
+<script>
+    document.getElementById('updateForm').addEventListener('submit', function (event) {
+        var newPassword = document.getElementById('modal_new_password').value;
+        var confirmNewPassword = document.getElementById('modal_confirm_new_password').value;
+
+        var passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d{5,})[A-Za-z\d]{7,}$/;
+
+        if (newPassword && !passwordPattern.test(newPassword)) {
+            alert('كلمة المرور يجب أن تحتوي على حرف كبير وحرف صغير وخمس أرقام.');
+            event.preventDefault();
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            alert('كلمتا المرور الجديدتان لا تتطابقان.');
+            event.preventDefault();
+            return;
+        }
+    });
+</script>
+
 </section>
 </main>
 
