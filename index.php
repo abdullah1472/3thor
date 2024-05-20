@@ -7,7 +7,7 @@ function isLoggedIn() {
   return isset($_SESSION['UserID']);
 }
 
-$defaultImagePath = "uploads/default.png"; // حدد مسار الصورة الافتراضية هنا
+$defaultImagePath = "uploads/default1.png"; // حدد مسار الصورة الافتراضية هنا
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
@@ -476,7 +476,7 @@ foreach ($products as $product) {
 
             // عرض الصورة الأولى أو الصورة الافتراضية إذا لم تكن هناك صور
             if (count($images) > 0 && $images[0] != '') {
-                $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
+                $imagePath = (strpos($images[0], 'default1.png') !== false) ? $images[0] : 'uploads/' . $images[0];
                 echo "<div class='product-image imgpo'>
                         <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'style='width:100%;'>
                     </div>";
