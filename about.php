@@ -37,7 +37,7 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>MyPortfolio Bootstrap Template - About</title>
+    <title>معلومات حسابي</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <link href="assets/img/favicon.png" rel="icon">
@@ -192,7 +192,7 @@ if (isset($_SESSION['error_message'])) {
 
 <nav class="navbar navbar-light custom-navbar">
     <div class="container">
-        <a class="navbar-brand" href="index1.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="230" hight="230"></a>
+        <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="230" hight="230"></a>
             <span></span>
         </a>
     </div>
@@ -291,7 +291,6 @@ if (isset($_SESSION['error_message'])) {
 </script>
 <div class="col-md-3 mb-5 mb-md-0" data-aos="fade-up">
                         <p><img src="assets/img/popo.png" alt="Image" class="img-fluid"></p>
-                     
                     </div>
 </section>
 </main>
