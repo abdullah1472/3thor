@@ -77,6 +77,7 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -130,9 +131,11 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     background-attachment: fixed; /* جعل الصورة ثابتة أثناء التمرير */
         }
         .imgpo {
-          background-size: cover; /* تغطية الشاشة بالصورة دون تشويه */
-          background-position: center; /* محاذاة الصورة في الوسط */
-        }
+  background-size: cover;
+  background-position: center;
+  height: 100%; /* Set the height of the image container */
+}
+
         /* Add your CSS styles here */
         .popup {
             display: none;
@@ -167,13 +170,19 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
             text-decoration: none;
             cursor: pointer;
         }
-        .product-image img {
-    width: 200px; /* تحديد عرض ثابت للصور */
-    height: 200px; /* تحديد ارتفاع ثابت للصور */
-    object-fit: cover; /* جعل الصور تغطي العنصر بالكامل دون تشويهها */
-    /* يمكنك إضافة أي خصائص إضافية تريدها هنا */
+        
+.product-image.imgpo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure the image container takes the full width */
+    height: 200px; /* Set the desired height */
 }
 
+.product-image.imgpo img {
+    max-width: 100%; /* Ensure the image does not exceed the container width */
+    max-height: 100%; /* Ensure the image does not exceed the container height */
+}
 
     </style>
 
@@ -208,9 +217,65 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
   
   <nav class="navbar navbar-light custom-navbar">
     <div class="container">
-    <a class="navbar-brand" href="#"><img class="navbar-brand" src="assets/img/logoname2.png" width="130" hight="130"></a>
+    <a class="navbar-brand" href="#"><img class="navbar-brand" src="assets/img/logoname2.png" width="230" hight="230"></a>
+    <div class="col-md-12 col-lg-6 text-start text-lg-end" data-aos="fade-up" data-aos-delay="100">
+          <div class="filters">
+    
+          <a href="index.php?category=إلكترونيات" class="<?= isset($_GET['category']) && $_GET['category'] == 'إلكترونيات' ? 'active' : '' ?>">إلكترونيات</a>
+    <a href="index.php?category=ملابس" class="<?= isset($_GET['category']) && $_GET['category'] == 'ملابس' ? 'active' : '' ?>">ملابس</a>
+    <a href="index.php?category=أجهزة منزلية" class="<?= isset($_GET['category']) && $_GET['category'] == 'أجهزة منزلية' ? 'active' : '' ?>">أجهزة منزلية</a>
+    <a href="index.php?category=كتب وملازم" class="<?= isset($_GET['category']) && $_GET['category'] == 'كتب وملازم' ? 'active' : '' ?>">كتب وملازم</a>
+    <a href="index.php?category=عقار" class="<?= isset($_GET['category']) && $_GET['category'] == 'عقار' ? 'active' : '' ?>">عقار</a>
+    <a href="index.php?category=أثاث" class="<?= isset($_GET['category']) && $_GET['category'] == 'أثاث' ? 'active' : '' ?>">أثاث</a>
+    <a href="index.php"  class="<?= !isset($_GET['category']) || $_GET['category'] == '' ? 'active' : '' ?>">الكل</a>
+</div>
+          </div>
+    <div class="col-lg-1">
+        
+    <?php
+   // session_start(); // بدء الجلسة
+
+    function printWelcomeMessage() {
+        if (isset($_SESSION['user'])) {
+            $username = $_SESSION['user'];
+            
+            echo '<div class="col-md-auto">';
+echo "<a href='about.php' class='readmore mb-4' style='font-size: 15px;'> $username</a>";
+echo '</div>';
+echo '<div class="col-md-auto">';
+echo '<a href="end_session.php" class="readmore border-danger bg-danger-subtle border-2 mb-4" style="font-size: 15px;">تسجيل خروج</a>';
+echo '</div>';
+            
+    
+        }
+         else {
+            
+            echo '<a href="login.php" class="readmore mb-4">سجل دخول</a>';
+        }
+    }
+
+    printWelcomeMessage();
+    ?>
+    
+    </div>
+    <div class="container">
+    <div class="row justify-content-md-center">
+    <div class="col col-lg-6">
+
+    <form method="GET" action="" class="input-group mb-3" style="display: flex; align-items: stretch;"> <!-- إضافة الخاصية align-items: stretch; لجعل الحقل والزرار بنفس الارتفاع -->
+        <input type="text" class="form-control border border-dark"  name="search" placeholder="بحث" aria-label="بحث" style="height: 38px;" aria-describedby="basic-addon2" value="<?php echo htmlspecialchars($searchTerm); ?>">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit" aria-label="Search" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                <img src="assets/img/searchimg.png" alt="صورة البحث" class="img-fluid" style="width: 20px; height: 20px;">
+            </button>
+        </div>
+    </form>
+</div>
+</div>
+</div>
     </div>
   </nav>
+ 
 
   <main id="main">
 
@@ -231,48 +296,79 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
           <?php
     if (isLoggedIn()) {
 ?>
-        <a href="#" onclick="openPopup()" class="readmore">لنشر</a>
+        <a href="#" onclick="openPopup()" class="readmore"  style="font-size: 15px;">للنشر</a>
 <?php
     } else {
         echo '<p>يجب عليك تسجيل الدخول أولاً لنشر المنتجات.</p>';
     }
 ?>
+
 <div id="productPopup" class="popup">
-    <div class="popup-content">
+    <div class="popup-content-center">
         <span class="close" onclick="closePopup()">&times;</span>
-        <h2>تعبئة بيانات المنتج</h2>
-        <form  method="post" enctype="multipart/form-data">
+        <div class="row justify-content-center">
+        <div class="col-md-4">
+        <div class="card">
+        <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">تعبئة بيانات المنتج</h2>
+                </div>
+                <div class="card-body">
+        <form id="productForm1" method="post" enctype="multipart/form-data">
+
+        <div class="form-group">
             <label for="productName">اسم المنتج:</label>
-            <input type="text" id="productName" name="productName" required><br><br>
+            <input type="text" id="productName" name="productName" class="form-control" required><br><br>
+            <div id="productNameError" class="invalid-feedback"></div>
+            </div>
 
+            <div class="form-group">
             <label for="productDescription">وصف المنتج:</label>
-            <textarea id="productDescription" name="productDescription" required></textarea><br><br>
+            <textarea id="productDescription" name="productDescription" class="form-control" rows="3" required></textarea>
+            <div id="productDescriptionError" class="invalid-feedback"></div>
+             </div>
 
-            <label for="productPrice">سعر المنتج:</label>
-            <input type="text" id="productPrice" name="productPrice" required><br><br>
 
-            <label for="productType">نوع المنتج:</label>
-            <select id="productType" name="productType" required>
-                <option value="">اختر نوع المنتج</option>
-                <option value="إلكترونيات">إلكترونيات</option>
-                <option value="ملابس">ملابس</option>
-                <option value="أثاث">أثاث</option>
-                <!-- Add more options as needed -->
-            </select><br><br>
+             <div class="form-group">
+             <label for="productPrice">سعر المنتج:</label>
+             <input type="text" id="productPrice" name="productPrice" class="form-control">
+             <div id="productPriceError" class="invalid-feedback"></div>
+             </div>
 
-            <label for="productLocation">موقع المنتج:</label>
-            <input type="text" id="productLocation" name="productLocation" required><br><br>
+             <div class="form-group">
+             <label for="productType">نوع المنتج:</label>
+             <select id="productType" name="productType" class="form-control" required>
+             <option value="">اختر نوع المنتج</option>
+                    <option value="إلكترونيات">إلكترونيات</option>
+                    <option value="ملابس">ملابس</option>
+                    <option value="أجهزة منزلية">أجهزة منزلية</option>
+                    <option value="كتب وملازم">كتب وملازم</option>
+                    <option value="عقار">عقار</option>
+                    <option value="أثاث">أثاث</option>
+                    <!-- Add more options as needed -->
+                            </select>
+                <div id="productTypeError" class="invalid-feedback"></div>
+                        </div>
 
-            <label for="productImages">صور المنتج:</label> 
-           <input type="file" id="productImages" name="productImages[]" multiple ><br><br>
-          
+                        <div class="form-group">
+                            <label for="productLocation">موقع المنتج:</label>
+                            <input type="text" id="productLocation" name="productLocation" class="form-control" required>
+                            <div id="productLocationError" class="invalid-feedback"></div>
+                        </div>
+
+            <div class="form-group">
+                            <label for="productImages">صور المنتج:</label>
+                            <input type="file" id="productImages" name="productImages[]" class="form-control-file" multiple>
+                            <div id="productImagesError" class="invalid-feedback"></div>
+                        </div>
     
-            <input type="submit" name="send" value="نشر">
+                        <button type="submit" name="send" class="btn btn-primary">نشر</button>
         </form>
+        </div>
     </div>
 </div>
-
-
+</div>
+</div>
+</div>
 <script>
     // JavaScript function to open the popup
     function openPopup() {
@@ -290,46 +386,16 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-      <div class="col-4">
-    <?php
-   // session_start(); // بدء الجلسة
-
-    function printWelcomeMessage() {
-        if (isset($_SESSION['user'])) {
-            $username = $_SESSION['user'];
-            echo "<p> $username</p>";
-            echo '<a href="about.php" class="readmore mb-4">عرض معلومات الحساب</a>';
-            echo '<a href="end_session.php" class="readmore border-danger bg-danger-subtle border-2 mb-4">تسجيل خروج</a>';
-        } else {
-            echo '<a href="login.php" class="readmore mb-4">سجل دخول</a>';
-        }
-    }
-
-    printWelcomeMessage();
-    ?>
-</div>
-
     </div>
   </div>
-  <div class="input-group mb-3">
-    <form method="GET" action="">
-        <input type="text" class="form-control" name="search" placeholder="بحث" aria-label="بحث" aria-describedby="basic-addon2" value="<?php echo htmlspecialchars($searchTerm); ?>">
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="submit">بحث</button>
-        </div>
-    </form>
-</div>
+  
+  
+
+
 
            
           </div>
-          <div class="col-md-12 col-lg-6 text-start text-lg-end" data-aos="fade-up" data-aos-delay="100">
-          <div class="filters">
-    <a href="index1.php" class="<?= !isset($_GET['category']) || $_GET['category'] == '' ? 'active' : '' ?>">الكل</a>
-    <a href="index1.php?category=إلكترونيات" class="<?= isset($_GET['category']) && $_GET['category'] == 'إلكترونيات' ? 'active' : '' ?>">إلكترونيات</a>
-    <a href="index1.php?category=ملابس" class="<?= isset($_GET['category']) && $_GET['category'] == 'ملابس' ? 'active' : '' ?>">ملابس</a>
-    <a href="index1.php?category=أثاث" class="<?= isset($_GET['category']) && $_GET['category'] == 'أثاث' ? 'active' : '' ?>">أثاث</a>
-</div>
-          </div>
+         
         </div>
 
         
@@ -401,7 +467,7 @@ foreach ($products as $product) {
 
     echo "
     <div id='portfolio-grid' class='row no-gutter' data-aos='fade-up' data-aos-delay='200'>
-        <div class='item web col-sm-6 col-md-4 col-lg-4 mb-4'>
+        <div class='item web col-sm-6 col-md-4 col-lg-3 mb-4'>
         <a href='work-single.php?id=" . $product['ProductID'] . "' class='item-wrap fancybox'>
             <div class='work-info'>
             <h3>" . $product['username'] . "</h3> <!-- عرض اسم المستخدم المرتبط بالمنتج -->
@@ -411,11 +477,11 @@ foreach ($products as $product) {
             // عرض الصورة الأولى أو الصورة الافتراضية إذا لم تكن هناك صور
             if (count($images) > 0 && $images[0] != '') {
                 $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
-                echo "<div class='product-image'>
-                        <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'>
+                echo "<div class='product-image imgpo'>
+                        <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'style='width:100%;'>
                     </div>";
             } else {
-                echo "<div class='product-image'>
+                echo "<div class='product-image imgpo'>
                         <img class='img-fluid' src='" . $defaultImagePath . "' alt='Product Image'>
                     </div>";
             }
