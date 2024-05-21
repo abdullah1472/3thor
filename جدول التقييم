@@ -1,0 +1,10 @@
+CREATE TABLE reviews (
+    ReviewID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Rating INT CHECK (Rating >= 1 AND Rating <= 5),
+    ReviewText TEXT,
+    ReviewDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES users(UserID),
+    FOREIGN KEY (ProductID) REFERENCES product(ProductID)
+);
