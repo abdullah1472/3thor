@@ -1,17 +1,19 @@
 <?php
 require 'contc.php';
 
+session_start();
+
 if (!isset($_GET['id'])) {
-    header('Location: index.php');
+    header('Location: index1.php');
     exit();
 }
 
 $productID = $_GET['id'];
-//echo "Product ID: " . $productID;
+echo "Product ID: " . $productID;
 
 // تعديل استعلام SQL لجلب بيانات البائع مع المنتج
 $sqlProduct = "
-    SELECT p.Title, p.Description, p.Price, p.Location, p.Category, u.Username, u.Phone
+    SELECT p.Title, p.Description, p.Price, p.Location, p.Category, u.UserID, u.Username, u.Phone
     FROM product p
     JOIN users u ON p.UserID = u.UserID
     WHERE p.ProductID = ?
@@ -43,6 +45,25 @@ if ($stmtImages->errorCode() !== '00000') {
 }
 $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 
+// مسار الصورة الافتراضية
+$defaultImagePath = "uploads/default.png";
+
+// استعلام لجلب متوسط التقييمات لجميع منتجات البائع
+$sqlAvgRating = "
+    SELECT AVG(r.Rating) as averageRating
+    FROM reviews r
+    JOIN product p ON r.ProductID = p.ProductID
+    WHERE p.UserID = ?
+";
+$stmtAvgRating = $conn->prepare($sqlAvgRating);
+if (!$stmtAvgRating) {
+    die('Query preparation failed: ' . $conn->errorInfo()[2]);
+}
+$stmtAvgRating->execute([$product['UserID']]);
+if ($stmtAvgRating->errorCode() !== '00000') {
+    die('Query execution failed: ' . $stmtAvgRating->errorInfo()[2]);
+}
+$avgRating = $stmtAvgRating->fetch(PDO::FETCH_ASSOC)['averageRating'];
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +115,7 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
 </head>
 <body>
     <nav class="navbar navbar-light custom-navbar">
-        <div class="container">
+    <div class="container">
         <a class="navbar-brand" href="index.php"><img class="navbar-brand" src="assets/img/logoname2.png" width="230" hight="230"></a>
             
         </div>
@@ -104,14 +125,27 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
             <div class="container">
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6" data-aos="fade-up">
-                        <h2><?= htmlspecialchars($product['Username']) ?></h2> <!-- استخدام اسم المستخدم بدلاً من عنوان المنتج -->
+                        <h2><?= htmlspecialchars($product['Username']) ?></h2>
                         <div class="seller-rating">
-                            <span class="bi bi-star-fill"></span>
-                            <span class="bi bi-star-fill"></span>
-                            <span class="bi bi-star-fill"></span>
-                            <span class="bi bi-star-fill"></span>
-                            <span class="bi bi-star-half"></span>
-                            <span>4.5</span>
+                            <?php
+                                $fullStars = floor($avgRating);
+                                $halfStar = $avgRating - $fullStars >= 0.5 ? true : false;
+
+                                for ($i = 0; $i < $fullStars; $i++) {
+                                    echo '<span class="bi bi-star-fill"></span>';
+                                }
+
+                                if ($halfStar) {
+                                    echo '<span class="bi bi-star-half"></span>';
+                                }
+
+                                $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                                for ($i = 0; $i < $emptyStars; $i++) {
+                                    echo '<span class="bi bi-star"></span>';
+                                }
+
+                                echo '<span>' . round($avgRating, 1) . '</span>';
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -121,9 +155,13 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
                     <div class="row align-items-stretch">
                         <div class="col-md-8" data-aos="fade-up">
                             <div class="images-container">
-                                <?php foreach ($images as $image): ?>
-                                    <img src="uploads/<?= htmlspecialchars($image) ?>" alt="Product Image" class="product-image">
-                                <?php endforeach; ?>
+                                <?php if (count($images) > 0 && $images[0] != '' && strpos($images[0], 'default.png') === false): ?>
+                                    <?php foreach ($images as $image): ?>
+                                        <img src="uploads/<?= htmlspecialchars($image) ?>" alt="Product Image" class="product-image">
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <img src="<?= htmlspecialchars($defaultImagePath) ?>" alt="Default Product Image" class="product-image">
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-3 ml-auto" data-aos="fade-up" data-aos-delay="100">
@@ -148,6 +186,40 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
                                 <a href="https://waffyapp.com/" target="_blank" class="alert alert-info mt-3 d-block text-decoration-none" role="alert">
                                     <strong>ملاحظة:</strong> الدفع يكون عن طريق وفّي لضمان حقوقك وعدم الاحتيال عليك.
                                 </a>
+                            
+                                <!-- زر فتح نموذج التقييم -->
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                    قيم البائع
+                                </button>
+                            </div>
+                            <!-- نموذج التقييم (داخل Modal) -->
+                            <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="reviewModalLabel">تقييم البائع</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form id="reviewForm" method="POST" action="submit_review.php">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="rating" class="form-label">التقييم (1-5):</label>
+                                                    <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="reviewText" class="form-label">التعليق:</label>
+                                                    <textarea class="form-control" id="reviewText" name="reviewText" rows="3"></textarea>
+                                                </div>
+                                                <input type="hidden" name="productID" value="<?= htmlspecialchars($productID) ?>">
+                                                <input type="hidden" name="userID" value="<?= htmlspecialchars($_SESSION['UserID']) ?>"> <!-- Assuming user is logged in and UserID is stored in session -->
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                                                <button type="submit" class="btn btn-primary">إرسال التقييم</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -158,7 +230,7 @@ $images = $stmtImages->fetchAll(PDO::FETCH_COLUMN);
     <footer class="footer" role="contentinfo">
         <div class="container">
             <div class="row">
-                <div class="col-sm-6">
+            <div class="col-sm-6">
                     <p class="mb-1">&copy; Copyright. All Rights Reserved</p>
                     
                 </div>
