@@ -188,6 +188,12 @@ if (isset($_SESSION['error_message'])) {
             errorAlert.style.display = 'none';
         }
     }, 3000);
+
+
+    function closeEditPopup() {
+    var editPopup = document.getElementById('editPopup');
+    editPopup.style.display = 'none';
+}
 </script>
 
 <nav class="navbar navbar-light custom-navbar">
