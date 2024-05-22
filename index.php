@@ -209,7 +209,7 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
                               </div>
                           </div>
                       </div>
-                  </div>>';
+                  </div>';
                    // بعد عرض الإنذار، قم بحذفه من الجلسة لعدم عرضه مرة أخرى
                    unset($_SESSION['login_success']);
             }
@@ -221,13 +221,13 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     <div class="col-md-12 col-lg-6 text-start text-lg-end" data-aos="fade-up" data-aos-delay="100">
           <div class="filters">
     
-          <a href="index.php?category=إلكترونيات" class="<?= isset($_GET['category']) && $_GET['category'] == 'إلكترونيات' ? 'active' : '' ?>">إلكترونيات</a>
-    <a href="index.php?category=ملابس" class="<?= isset($_GET['category']) && $_GET['category'] == 'ملابس' ? 'active' : '' ?>">ملابس</a>
-    <a href="index.php?category=أجهزة منزلية" class="<?= isset($_GET['category']) && $_GET['category'] == 'أجهزة منزلية' ? 'active' : '' ?>">أجهزة منزلية</a>
-    <a href="index.php?category=كتب وملازم" class="<?= isset($_GET['category']) && $_GET['category'] == 'كتب وملازم' ? 'active' : '' ?>">كتب وملازم</a>
-    <a href="index.php?category=عقار" class="<?= isset($_GET['category']) && $_GET['category'] == 'عقار' ? 'active' : '' ?>">عقار</a>
-    <a href="index.php?category=أثاث" class="<?= isset($_GET['category']) && $_GET['category'] == 'أثاث' ? 'active' : '' ?>">أثاث</a>
-    <a href="index.php"  class="<?= !isset($_GET['category']) || $_GET['category'] == '' ? 'active' : '' ?>">الكل</a>
+          <a href="index.php?category=إلكترونيات" style="font-size: 24px;" class="<?= isset($_GET['category']) && $_GET['category'] == 'إلكترونيات' ? 'active' : '' ?>">إلكترونيات</a>
+    <a href="index.php?category=ملابس" style="font-size: 24px;" class="<?= isset($_GET['category']) && $_GET['category'] == 'ملابس' ? 'active' : '' ?>">ملابس</a>
+    <a href="index.php?category=أجهزة منزلية" style="font-size: 25px;" class="<?= isset($_GET['category']) && $_GET['category'] == 'أجهزة منزلية' ? 'active' : '' ?>">أجهزة منزلية</a>
+    <a href="index.php?category=كتب وملازم" style="font-size: 25px;" class="<?= isset($_GET['category']) && $_GET['category'] == 'كتب وملازم' ? 'active' : '' ?>">كتب وملازم</a>
+    <a href="index.php?category=عقار" style="font-size: 25px;" class="<?= isset($_GET['category']) && $_GET['category'] == 'عقار' ? 'active' : '' ?>">عقار</a>
+    <a href="index.php?category=أثاث" style="font-size: 25px;" class="<?= isset($_GET['category']) && $_GET['category'] == 'أثاث' ? 'active' : '' ?>">أثاث</a>
+    <a href="index.php" style="font-size: 25px;"  class="<?= !isset($_GET['category']) || $_GET['category'] == '' ? 'active' : '' ?>">الكل</a>
 </div>
           </div>
     <div class="col-lg-1">
