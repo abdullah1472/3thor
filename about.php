@@ -3,7 +3,7 @@ session_start();
 require 'contc.php'; // توصيل قاعدة البيانات
 
 if (!isset($_SESSION['UserID'])) {
-    header('Location: login1.php'); // توجيه إلى صفحة الدخول إذا لم يكن المستخدم مسجلاً
+    header('Location: login.php'); // توجيه إلى صفحة الدخول إذا لم يكن المستخدم مسجلاً
     exit();
 }
 
@@ -37,11 +37,11 @@ $products = $stmtt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>معلومات حسابي</title>
+    <title>حسابي</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <link href="assets/img/favicon.png" rel="icon">
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="assets/img/logoname2.png" rel="icon">
+  <link href="assets/img/logoname2.png" rel="apple-touch-icon">
     <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,500,600,700|Raleway:400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
     <link href="assets/vendor/aos/aos.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -291,6 +291,7 @@ if (isset($_SESSION['error_message'])) {
 </script>
 <div class="col-md-3 mb-5 mb-md-0" data-aos="fade-up">
                         <p><img src="assets/img/popo.png" alt="Image" class="img-fluid"></p>
+                     
                     </div>
 </section>
 </main>
