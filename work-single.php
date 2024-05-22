@@ -2,14 +2,17 @@
 require 'contc.php';
 
 session_start();
+function isLoggedIn() {
+    return isset($_SESSION['UserID']);
+  }
 
 if (!isset($_GET['id'])) {
-    header('Location: index1.php');
+    header('Location: index.php');
     exit();
 }
 
 $productID = $_GET['id'];
-echo "Product ID: " . $productID;
+//echo "Product ID: " . $productID;
 
 // تعديل استعلام SQL لجلب بيانات البائع مع المنتج
 $sqlProduct = "
@@ -105,6 +108,10 @@ $avgRating = $stmtAvgRating->fetch(PDO::FETCH_ASSOC)['averageRating'];
         .seller-rating span {
             color: #ffd700;
         }
+        .bgc{
+           background-color:#F6F5F2;
+           width: 110px;
+        }
     </style>
     <script>
         // Scroll to the top of the page on refresh
@@ -126,7 +133,7 @@ $avgRating = $stmtAvgRating->fetch(PDO::FETCH_ASSOC)['averageRating'];
                 <div class="row mb-4 align-items-center">
                     <div class="col-md-6" data-aos="fade-up">
                         <h2><?= htmlspecialchars($product['Username']) ?></h2>
-                        <div class="seller-rating">
+                        <div  class="seller-rating bgc">
                             <?php
                                 $fullStars = floor($avgRating);
                                 $halfStar = $avgRating - $fullStars >= 0.5 ? true : false;
@@ -172,7 +179,7 @@ $avgRating = $stmtAvgRating->fetch(PDO::FETCH_ASSOC)['averageRating'];
                                     <li>
                                         <div class="card">
                                             <div class="card-header">
-                                                <h4 class="h4 mb-3">:شرح المنتج</h4>
+                                                <h4 class="h4 mb-3">:وصف المنتج</h4>
                                             </div>
                                             <div class="card-body">
                                                 <p class="card-text"><?= htmlspecialchars($product['Description']) ?></p>
@@ -187,10 +194,28 @@ $avgRating = $stmtAvgRating->fetch(PDO::FETCH_ASSOC)['averageRating'];
                                     <strong>ملاحظة:</strong> الدفع يكون عن طريق وفّي لضمان حقوقك وعدم الاحتيال عليك.
                                 </a>
                             
-                                <!-- زر فتح نموذج التقييم -->
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+
+
+                                <?php
+                   if (isLoggedIn()) {
+                        ?>
+                       <!-- زر فتح نموذج التقييم -->
+                       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
                                     قيم البائع
                                 </button>
+                        <?php
+                             } else {
+                                ?>
+                               <button type="button" class="btn btn-primary" data-bs-toggle="modal" >
+                                 يجب تسجيل الدخول لتقيم البائع
+                                </button>
+                               <?php
+                             }
+                        ?>
+
+
+
+                               
                             </div>
                             <!-- نموذج التقييم (داخل Modal) -->
                             <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
@@ -211,7 +236,8 @@ $avgRating = $stmtAvgRating->fetch(PDO::FETCH_ASSOC)['averageRating'];
                                                     <textarea class="form-control" id="reviewText" name="reviewText" rows="3"></textarea>
                                                 </div>
                                                 <input type="hidden" name="productID" value="<?= htmlspecialchars($productID) ?>">
-                                                <input type="hidden" name="userID" value="<?= htmlspecialchars($_SESSION['UserID']) ?>"> <!-- Assuming user is logged in and UserID is stored in session -->
+                                                <input type="hidden" name="userID" value="<?= htmlspecialchars($_SESSION['UserID']) ?>"> 
+                                                <!-- Assuming user is logged in and UserID is stored in session -->
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
