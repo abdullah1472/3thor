@@ -3,7 +3,7 @@ require 'contc.php';
 
 // بدء الجلسة
 session_start();
-
+$error_message2 = '';
 // التحقق من تقديم بيانات الدخول وتخزينها في الجلسة
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
 
@@ -24,18 +24,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
         $_SESSION['UserID'] = $result['UserID'];      
         // توجيه المستخدم إلى الصفحة الأخرى
         $_SESSION['login_success'] = true;
-        header("Location: index1.php");
+        header("Location: index.php");
         
         exit;
-    } else {
-        echo "لم يتم العثور على مستخدم مطابق!";
+    } 
+    else {
+        $error_message2 = 'لم يتم العثور على مستخدم مطابق!';
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Login</title>
+    <title>تسجيل دخول</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css" rel="stylesheet" />
@@ -70,8 +71,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
             document.querySelectorAll('.form-outline').forEach((formOutline) => {
                 new mdb.Input(formOutline).init();
             });
+             // عرض رسالة الخطأ إذا كانت موجودة
+ var errorMessage2 = "<?php echo $error_message2; ?>";
+            if (errorMessage2) {
+                $("#error-alert2").text(errorMessage2).show();
+            } else {
+            $('#error-alert2').hide();
+        }
         });
+
+       
+        
+        
     </script>
+    <script>
+
+ 
+        
+        
+</script>
     <style>
         .form-outline .form-label.active {
             transform: translateY(-1.5rem) scale(0.8);
@@ -108,7 +126,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
                                 <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
                                     <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">تسجيل دخول</p>
                                     <form class="mx-1 mx-md-4" method="POST" action="">
-
+                                    <div id="error-alert2" class="alert alert-danger" role="alert">
+                                            <!-- سيتم ملء محتوى الخطأ بواسطة جافا سكريبت -->
+                                        </div>
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-user fa-lg me-3 fa-fw"></i>
                                             <div class="form-outline flex-fill mb-0">
@@ -134,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
                                         </div>
 
                                         <div class="text-center text-lg-start mt-4 pt-2">
-                                            <button type="submit" name="send" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg" style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
+                                            <button type="submit" name="send" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg" style="padding-left: 2.5rem; padding-right: 2.5rem;">دخول</button>
                                             <p class="small fw-bold mt-2 pt-1 mb-0">ليس لديك حساب؟ <a href="reg.php" class="link-danger">سجل</a></p>
                                         </div>
 
