@@ -22,7 +22,15 @@ if (isset($_POST['send'])) {
     } elseif (strlen($pass) < 5 || !preg_match('/[0-9]/', $pass)) {
         // التحقق من تعقيد كلمة المرور
         $error_message = 'كلمة المرور يجب أن تحتوي على الأقل 5 أحرف ورقم واحد على الأقل.';
-    } else {
+    }
+    elseif (!preg_match('/^0[0-9]{9}$/', $phone)){
+      
+        // رسالة خطأ أو معالجة الخطأ
+        $error_message ='رقم الجوال غير صالح. يجب أن يبدأ بصفر ويتكون من 10 أرقام.';
+    
+    }
+    
+    else {
         // التحقق من عدم وجود اسم مستخدم مماثل في قاعدة البيانات
         $sql_check_user = "SELECT * FROM users WHERE UserName = ?";
         $stmt_check_user = $conn->prepare($sql_check_user);
@@ -92,7 +100,7 @@ if (isset($_POST['send'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            $(".alert").fadeTo(2000, 500).slideUp(500, function () {
+            $(".alert").fadeTo(5000, 500).slideUp(500, function () {
                 $(".alert").slideUp(500);
             });
 
@@ -120,9 +128,23 @@ if (isset($_POST['send'])) {
             var errorMessage = "<?php echo $error_message; ?>";
             if (errorMessage) {
                 $("#error-alert").text(errorMessage).show();
-            }
+            } else {
+            $('#error-alert').hide();
+        }
+        
         });
     </script>
+    <script>
+function validatePhoneNumber(input) {
+    // إزالة جميع الأحرف غير الأرقام
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    // إذا كان طول الإدخال أكبر من 10 أرقام، اقتصاص الإدخال إلى 10 أرقام
+    if (input.value.length > 10) {
+        input.value = input.value.slice(0, 10);
+    }
+}
+</script>
 </head>
 <body>
     <section class="vh-100">
@@ -143,23 +165,23 @@ if (isset($_POST['send'])) {
                                             <i class="fas fa-user fa-lg me-3 fa-fw"></i>
                                             <div class="form-outline flex-fill mb-0">
                                                 <input type="text" name="user" id="form3Example1c" class="form-control" value="<?php echo isset($user) ? $user : ''; ?>" required/>
-                                                <label class="form-label" for="form3Example1c">اسمك كامل</label>
+                                                <label class="form-label" for="form3Example1c">اسم المستخدم</label>
                                             </div>
                                         </div>
 
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                                             <div class="form-outline flex-fill mb-0">
-                                                <input type="email" name="email" id="form3Example3c" class="form-control" value="<?php echo isset($email) ? $email : ''; ?>" required/>
-                                                <label class="form-label" for="form3Example3c">الايميل</label>
+                                            <input type="email" name="email" id="form3Example3c" class="form-control" value="<?php echo isset($email) ? $email : ''; ?>" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                                            <label class="form-label" for="form3Example3c">الايميل</label>
                                             </div>
                                         </div>
 
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-mobile-screen-button fa-lg me-3 fa-fw"></i>
                                             <div class="form-outline flex-fill mb-0">
-                                                <input type="phone" name="phone" id="form3Example4c" class="form-control" value="<?php echo isset($phone) ? $phone : ''; ?>" required/>
-                                                <label class="form-label" for="form3Example4c">رقم الجوال</label>
+                                            <input type="tel" name="phone" id="form3Example4c" class="form-control" maxlength="10" value="<?php echo isset($phone) ? $phone : ''; ?>" required oninput="validatePhoneNumber(this)"/>
+                                            <label class="form-label" for="form3Example4c">رقم الجوال</label>
                                             </div>
                                         </div>
 
