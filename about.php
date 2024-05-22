@@ -8,7 +8,7 @@ if (!isset($_SESSION['UserID'])) {
 }
 
 $user_id = $_SESSION['UserID'];
-$defaultImagePath = "uploads/default.png"; // مسار الصورة الافتراضية
+$defaultImagePath = "uploads/default1.png"; // مسار الصورة الافتراضية
 
 // استعلام لاستعادة معلومات الحساب
 $stmt_user = $conn->prepare("SELECT * FROM users WHERE UserID = ?");
@@ -324,7 +324,7 @@ if (isset($_SESSION['error_message'])) {
                     <?php
                     $images = explode(",", $product['ImageDescription']);
                     if (count($images) > 0 && $images[0] != '') {
-                        $imagePath = (strpos($images[0], 'default.png') !== false) ? $images[0] : 'uploads/' . $images[0];
+                        $imagePath = (strpos($images[0], 'default1.png') !== false) ? $images[0] : 'uploads/' . $images[0];
                         echo "<div class='product-image imgpo'>
                         <img class='img-fluid' src='" . $imagePath . "' alt='Product Image'style='width:100%;'>
                     </div>";
